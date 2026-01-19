@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced CGPA Projector</title>
+    <title>Ultimate CGPA Projector</title>
     <style>
         :root {
             --bg-color: #0f172a;
             --card-bg: #1e293b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --accent: #06b6d4; /* Cyan */
+            --accent: #06b6d4;
             --accent-hover: #0891b2;
-            --accent-glow: rgba(6, 182, 212, 0.2);
+            --accent-glow: rgba(6, 182, 212, 0.25);
             --border: #334155;
             --success: #10b981;
             --danger: #ef4444;
-            --remove: #f43f5e;
+            --warning: #f59e0b;
         }
 
         * {
@@ -31,7 +31,7 @@
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Align top for long lists */
+            align-items: flex-start;
             min-height: 100vh;
             padding: 40px 20px;
         }
@@ -62,7 +62,7 @@
             margin-bottom: 2rem;
         }
 
-        /* Semester List Styling */
+        /* --- Dynamic Semester List --- */
         .sem-list {
             display: flex;
             flex-direction: column;
@@ -72,21 +72,21 @@
 
         .sem-row {
             display: grid;
-            grid-template-columns: 1fr 1fr auto; /* SGPA, Credits, Delete */
+            grid-template-columns: 1fr 1fr auto;
             gap: 10px;
             align-items: end;
             background: rgba(0,0,0,0.2);
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             border: 1px solid var(--border);
             animation: slideIn 0.3s ease;
         }
 
-        .input-wrapper label {
+        label {
             display: block;
             font-size: 0.75rem;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         input {
@@ -106,7 +106,7 @@
             box-shadow: 0 0 8px var(--accent-glow);
         }
 
-        /* Buttons */
+        /* --- Buttons --- */
         .btn-group {
             display: flex;
             gap: 10px;
@@ -139,9 +139,12 @@
         .btn-calc {
             background: var(--accent);
             color: #0f172a;
-            flex: 2;
-            font-weight: 700;
+            flex: 1;
+            font-weight: 800;
+            font-size: 1.1rem;
             box-shadow: 0 4px 15px var(--accent-glow);
+            margin-top: 1rem;
+            width: 100%;
         }
         .btn-calc:hover { background: var(--accent-hover); }
 
@@ -149,46 +152,60 @@
             background: rgba(244, 63, 94, 0.1);
             color: var(--remove);
             width: 40px;
-            height: 40px; /* Square button */
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            margin-bottom: 1px; /* Align with inputs */
+            margin-bottom: 2px;
         }
         .btn-remove:hover { background: var(--remove); color: white; }
 
-        /* Current Sem Section */
-        .current-sem-section {
+        /* --- Current Sem & Target Section --- */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             border-top: 1px solid var(--border);
             padding-top: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
-        /* Result Section */
+        .target-box {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* --- Result Section --- */
         #result-section {
             display: none;
             margin-top: 2rem;
             border-top: 1px solid var(--border);
             padding-top: 1.5rem;
+            animation: fadeIn 0.4s ease;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+        .target-result-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+        }
+        
+        .target-message {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
         }
 
-        .stat-box {
-            background: rgba(255,255,255,0.03);
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
+        .target-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent);
         }
-        .stat-label { font-size: 0.8rem; color: var(--text-muted); }
-        .stat-value { font-size: 1.2rem; font-weight: bold; color: var(--text-main); }
-        .stat-value.accent { color: var(--accent); }
 
         table {
             width: 100%;
@@ -218,43 +235,42 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>CGPA Projector</h1>
-        <p class="subtitle">Enter past semesters individually for precision</p>
+        <h1>Grade Planner</h1>
+        <p class="subtitle">Add past semesters & set your target.</p>
 
-        <div id="semesters-container" class="sem-list">
-            </div>
-
+        <div id="semesters-container" class="sem-list"></div>
         <div class="btn-group">
-            <button class="btn-add" onclick="addSemesterRow()">+ Add Sem</button>
+            <button class="btn-add" onclick="addSemesterRow()">+ Add Past Semester</button>
         </div>
 
-        <div class="current-sem-section">
+        <div class="grid-2">
             <div class="input-wrapper">
-                <label style="font-size: 0.9rem; margin-bottom: 8px; color: var(--text-main);">Current Semester Credits</label>
+                <label style="color:white; font-weight:600;">Current Sem Credits</label>
                 <input type="number" id="currCredits" placeholder="e.g. 24" step="0.5" min="0">
             </div>
+            <div class="input-wrapper target-box">
+                <label style="color:var(--accent); font-weight:600;">Target CGPA (Goal)</label>
+                <input type="number" id="targetCgpa" placeholder="e.g. 9.0" step="0.01" min="0" max="10">
+            </div>
         </div>
 
-        <button class="btn-calc" onclick="calculate()">Calculate Projections</button>
+        <button class="btn-calc" onclick="calculate()">Calculate & Project</button>
 
         <div id="result-section">
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-label">Current CGPA</div>
-                    <div class="stat-value accent" id="current-cgpa-display">0.00</div>
+            
+            <div id="target-feedback" class="target-result-card">
                 </div>
-                <div class="stat-box">
-                    <div class="stat-label">Total Credits (with current)</div>
-                    <div class="stat-value" id="total-credits-display">0</div>
-                </div>
-            </div>
 
+            <h4 style="margin-bottom:10px; color:var(--text-muted);">Scenario Table</h4>
             <table>
                 <thead>
                     <tr>
@@ -271,7 +287,7 @@
     <script>
         const container = document.getElementById('semesters-container');
 
-        // Initialize with 1 empty row
+        // Start with 1 empty row
         window.onload = function() {
             addSemesterRow();
         };
@@ -283,11 +299,11 @@
             div.innerHTML = `
                 <div class="input-wrapper">
                     <label>Sem ${count} SGPA</label>
-                    <input type="number" class="sem-sgpa" placeholder="10.0" step="0.01">
+                    <input type="number" class="sem-sgpa" placeholder="0-10" step="0.01">
                 </div>
                 <div class="input-wrapper">
                     <label>Sem ${count} Credits</label>
-                    <input type="number" class="sem-credits" placeholder="20" step="0.5">
+                    <input type="number" class="sem-credits" placeholder="Credit" step="0.5">
                 </div>
                 <button class="btn-remove" onclick="removeRow(this)" title="Remove">×</button>
             `;
@@ -310,89 +326,137 @@
         }
 
         function calculate() {
-            // 1. Gather Past Data
+            // --- 1. RESET STATE ---
+            // Clear previous outputs immediately to ensure fresh processing
+            const tbody = document.getElementById('projection-body');
+            const targetBox = document.getElementById('target-feedback');
+            const resultSection = document.getElementById('result-section');
+            
+            tbody.innerHTML = "";
+            targetBox.innerHTML = "";
+            resultSection.style.display = "none";
+
+            // --- 2. GATHER FRESH DATA ---
+            // We define variables inside function scope so they are never stale
             let totalPastPoints = 0;
             let totalPastCredits = 0;
-            
+            let isValid = true;
+
             const sgpaInputs = document.querySelectorAll('.sem-sgpa');
             const creditInputs = document.querySelectorAll('.sem-credits');
-            
-            let isValid = true;
 
             for(let i=0; i<sgpaInputs.length; i++) {
                 const s = parseFloat(sgpaInputs[i].value);
                 const c = parseFloat(creditInputs[i].value);
 
+                // Only count complete rows
                 if(!isNaN(s) && !isNaN(c)) {
                     totalPastPoints += (s * c);
                     totalPastCredits += c;
                 } else if (sgpaInputs[i].value !== "" || creditInputs[i].value !== "") {
-                    // If one field is filled but not the other in a row
-                    isValid = false;
+                    isValid = false; // Half-filled row
                 }
             }
 
-            // 2. Gather Current Sem Data
-            const currCreds = parseFloat(document.getElementById('currCredits').value);
+            const currCredits = parseFloat(document.getElementById('currCredits').value);
+            const targetCgpa = parseFloat(document.getElementById('targetCgpa').value);
 
-            if (isNaN(currCreds)) {
-                alert("Please enter credits for the Current Semester.");
+            // Validation
+            if (isNaN(currCredits)) {
+                alert("Please enter Current Semester Credits.");
                 return;
             }
             if (!isValid) {
-                alert("Please complete all Semester rows or remove empty ones.");
+                alert("Please ensure all Semester rows are fully filled or removed.");
                 return;
             }
 
-            // 3. Current Statistics
-            const currentCGPA = totalPastCredits > 0 ? (totalPastPoints / totalPastCredits) : 0;
-            const finalTotalCredits = totalPastCredits + currCreds;
+            // --- 3. CORE CALCULATIONS ---
+            const totalFutureCredits = totalPastCredits + currCredits;
+            const currentCgpa = totalPastCredits > 0 ? (totalPastPoints / totalPastCredits) : 0;
 
-            // Update UI Stats
-            document.getElementById('current-cgpa-display').innerText = currentCGPA.toFixed(2);
-            document.getElementById('total-credits-display').innerText = finalTotalCredits;
+            // --- 4. TARGET ANALYSIS ---
+            if (!isNaN(targetCgpa)) {
+                // Formula: RequiredPoints = (TargetCGPA * TotalCredits) - PastPoints
+                // RequiredSGPA = RequiredPoints / CurrentCredits
+                const requiredTotalPoints = targetCgpa * totalFutureCredits;
+                const pointsNeeded = requiredTotalPoints - totalPastPoints;
+                const requiredSgpa = pointsNeeded / currCredits;
 
-            // 4. Generate Projections (Step 0.2)
-            const tbody = document.getElementById('projection-body');
-            tbody.innerHTML = "";
+                let feedbackHtml = "";
 
-            // Loop from 10.0 down to 4.0 in steps of 0.2
-            for (let targetSgpa = 10.0; targetSgpa >= 4.0; targetSgpa -= 0.2) {
-                // Fix floating point math issues (e.g. 9.80000001)
-                const sgpa = parseFloat(targetSgpa.toFixed(1)); 
+                if (requiredSgpa > 10.0) {
+                    const maxPossiblePoints = totalPastPoints + (10 * currCredits);
+                    const maxPossibleCgpa = maxPossiblePoints / totalFutureCredits;
+                    
+                    feedbackHtml = `
+                        <div class="target-message" style="color: var(--danger)">Goal Unreachable</div>
+                        <div style="color: #cbd5e1; margin-bottom:5px;">
+                            You need <span style="color:var(--danger); font-weight:bold;">${requiredSgpa.toFixed(2)} SGPA</span>.
+                        </div>
+                        <div style="font-size:0.9rem; color: var(--text-muted)">
+                            Even with 10.0 SGPA, your max CGPA will be <span style="color:white; font-weight:bold;">${maxPossibleCgpa.toFixed(2)}</span>.
+                        </div>
+                    `;
+                } else if (requiredSgpa <= 0) {
+                     feedbackHtml = `
+                        <div class="target-message" style="color: var(--success)">Goal Secured</div>
+                        <div style="color: #cbd5e1;">
+                            You are already above this target based on past performance.
+                        </div>
+                    `;
+                } else {
+                    feedbackHtml = `
+                        <div class="target-message">To reach <span style="color:white">${targetCgpa}</span> CGPA</div>
+                        <div style="color: #cbd5e1; margin-bottom: 5px;">You need to score at least:</div>
+                        <div class="target-value">${requiredSgpa.toFixed(2)} SGPA</div>
+                    `;
+                }
+                targetBox.innerHTML = feedbackHtml;
+            } else {
+                targetBox.innerHTML = `<div style="color:var(--text-muted); font-style:italic;">Enter a Target CGPA above to see requirements.</div>`;
+            }
 
-                const newPoints = sgpa * currCreds;
-                const grandTotalPoints = totalPastPoints + newPoints;
-                const projectedCgpa = grandTotalPoints / finalTotalCredits;
+            // --- 5. SCENARIO PROJECTION LOOP ---
+            for (let sgpa = 10.0; sgpa >= 4.0; sgpa -= 0.2) {
+                const s = parseFloat(sgpa.toFixed(1)); // clean float
+                const grandTotal = totalPastPoints + (s * currCredits);
+                const projected = grandTotal / totalFutureCredits;
                 
-                // Calculate Difference
-                const diff = projectedCgpa - currentCGPA;
-                let diffStr = "";
+                // Diff logic
+                const diff = projected - currentCgpa;
+                let diffStr = "-";
                 let diffClass = "neutral";
 
-                if (diff > 0.001) {
-                    diffStr = "▲ " + diff.toFixed(3); // Showing 3 decimal places for precision
-                    diffClass = "gain";
-                } else if (diff < -0.001) {
-                    diffStr = "▼ " + Math.abs(diff).toFixed(3);
-                    diffClass = "loss";
-                } else {
-                    diffStr = "-";
+                if (totalPastCredits > 0) {
+                    if (diff > 0.001) {
+                        diffStr = "▲ " + diff.toFixed(3);
+                        diffClass = "gain";
+                    } else if (diff < -0.001) {
+                        diffStr = "▼ " + Math.abs(diff).toFixed(3);
+                        diffClass = "loss";
+                    }
+                }
+
+                // Highlight row if it meets target
+                let rowStyle = "";
+                if (!isNaN(targetCgpa) && projected >= targetCgpa - 0.001) {
+                    rowStyle = "background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success);";
                 }
 
                 const row = `
-                    <tr>
-                        <td style="font-weight:bold; color:#fff;">${sgpa}</td>
-                        <td style="font-size:1.1em;">${projectedCgpa.toFixed(2)}</td>
-                        <td class="${diffClass}" style="font-size:0.85em; font-weight:600;">${diffStr}</td>
+                    <tr style="${rowStyle}">
+                        <td style="font-weight:bold; color:white;">${s}</td>
+                        <td style="font-size:1.1em; font-weight:bold;">${projected.toFixed(2)}</td>
+                        <td class="${diffClass}">${diffStr}</td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
             }
 
-            document.getElementById('result-section').style.display = "block";
-            // Smooth scroll to results
-            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+            // --- 6. DISPLAY RESULTS ---
+            resultSection.style.display = "block";
+            targetBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     </script>
 </body>
