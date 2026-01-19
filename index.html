@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CGPA Projector</title>
+    <title>Advanced CGPA Projector</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -11,10 +11,12 @@
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --accent: #06b6d4; /* Cyan */
-            --accent-glow: rgba(6, 182, 212, 0.4);
+            --accent-hover: #0891b2;
+            --accent-glow: rgba(6, 182, 212, 0.2);
             --border: #334155;
             --success: #10b981;
             --danger: #ef4444;
+            --remove: #f43f5e;
         }
 
         * {
@@ -29,243 +31,368 @@
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Align top for long lists */
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             background: var(--card-bg);
             padding: 2rem;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
             border: 1px solid var(--border);
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 1.5rem;
-            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
             background: linear-gradient(90deg, #fff, var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
         }
 
-        .input-group {
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Semester List Styling */
+        .sem-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
             margin-bottom: 1.5rem;
         }
 
-        label {
+        .sem-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto; /* SGPA, Credits, Delete */
+            gap: 10px;
+            align-items: end;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            animation: slideIn 0.3s ease;
+        }
+
+        .input-wrapper label {
             display: block;
-            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 500;
+            margin-bottom: 4px;
         }
 
         input {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             background: #0f172a;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 6px;
             color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            transition: all 0.2s;
         }
 
         input:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
         }
 
         button {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent);
-            color: #0f172a;
+            padding: 12px;
             border: none;
             border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.1s, background 0.2s;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px var(--accent-glow);
+        button:active { transform: scale(0.98); }
+
+        .btn-add {
+            background: var(--card-bg);
+            border: 1px dashed var(--text-muted);
+            color: var(--text-muted);
+            flex: 1;
+        }
+        .btn-add:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        .btn-calc {
+            background: var(--accent);
+            color: #0f172a;
+            flex: 2;
+            font-weight: 700;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        .btn-calc:hover { background: var(--accent-hover); }
+
+        .btn-remove {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--remove);
+            width: 40px;
+            height: 40px; /* Square button */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 1px; /* Align with inputs */
+        }
+        .btn-remove:hover { background: var(--remove); color: white; }
+
+        /* Current Sem Section */
+        .current-sem-section {
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
         /* Result Section */
         #result-section {
+            display: none;
             margin-top: 2rem;
-            display: none; /* Hidden by default */
-            animation: fadeIn 0.5s ease;
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
         }
 
-        .summary {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.03);
+            padding: 10px;
             border-radius: 8px;
             text-align: center;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
         }
-
-        .summary span {
-            color: var(--accent);
-            font-weight: bold;
-        }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); }
+        .stat-value { font-size: 1.2rem; font-weight: bold; color: var(--text-main); }
+        .stat-value.accent { color: var(--accent); }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            overflow: hidden;
-            border-radius: 8px;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
         }
 
         th {
-            background-color: rgba(6, 182, 212, 0.1);
+            text-align: left;
             color: var(--accent);
-            font-size: 0.85rem;
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        tr:last-child td {
-            border-bottom: none;
+        td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        tr:hover {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
+        .gain { color: var(--success); }
+        .loss { color: var(--danger); }
+        .neutral { color: var(--text-muted); }
 
-        /* Impact Colors */
-        .high-impact { color: var(--success); }
-        .low-impact { color: var(--danger); }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @media (max-width: 480px) {
-            .container { padding: 1.5rem; }
-        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>CGPA Projector</h1>
-        
-        <div class="input-group">
-            <label for="prevCgpa">Current CGPA (Till Previous Sem)</label>
-            <input type="number" id="prevCgpa" placeholder="e.g. 8.5" step="0.01" min="0" max="10">
+        <p class="subtitle">Enter past semesters individually for precision</p>
+
+        <div id="semesters-container" class="sem-list">
+            </div>
+
+        <div class="btn-group">
+            <button class="btn-add" onclick="addSemesterRow()">+ Add Sem</button>
         </div>
 
-        <div class="input-group">
-            <label for="prevCredits">Total Credits Completed (Till Previous Sem)</label>
-            <input type="number" id="prevCredits" placeholder="e.g. 80" step="0.5" min="0">
+        <div class="current-sem-section">
+            <div class="input-wrapper">
+                <label style="font-size: 0.9rem; margin-bottom: 8px; color: var(--text-main);">Current Semester Credits</label>
+                <input type="number" id="currCredits" placeholder="e.g. 24" step="0.5" min="0">
+            </div>
         </div>
 
-        <div class="input-group">
-            <label for="currCredits">Credits This Semester</label>
-            <input type="number" id="currCredits" placeholder="e.g. 24" step="0.5" min="0">
-        </div>
-
-        <button onclick="calculateProjection()">Calculate Scenarios</button>
+        <button class="btn-calc" onclick="calculate()">Calculate Projections</button>
 
         <div id="result-section">
-            <div class="summary" id="summary-text">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Current CGPA</div>
+                    <div class="stat-value accent" id="current-cgpa-display">0.00</div>
                 </div>
+                <div class="stat-box">
+                    <div class="stat-label">Total Credits (with current)</div>
+                    <div class="stat-value" id="total-credits-display">0</div>
+                </div>
+            </div>
+
             <table>
                 <thead>
                     <tr>
-                        <th>If Sem SGPA is</th>
+                        <th>If Sem SGPA</th>
                         <th>New CGPA</th>
-                        <th>Change</th>
+                        <th>Impact</th>
                     </tr>
                 </thead>
-                <tbody id="projection-body">
-                    </tbody>
+                <tbody id="projection-body"></tbody>
             </table>
         </div>
     </div>
 
     <script>
-        function calculateProjection() {
-            // 1. Get Inputs
-            const prevCgpa = parseFloat(document.getElementById('prevCgpa').value);
-            const prevCredits = parseFloat(document.getElementById('prevCredits').value);
-            const currCredits = parseFloat(document.getElementById('currCredits').value);
+        const container = document.getElementById('semesters-container');
 
-            // 2. Validation
-            if (isNaN(prevCgpa) || isNaN(prevCredits) || isNaN(currCredits)) {
-                alert("Please fill in all fields with valid numbers.");
+        // Initialize with 1 empty row
+        window.onload = function() {
+            addSemesterRow();
+        };
+
+        function addSemesterRow() {
+            const count = container.children.length + 1;
+            const div = document.createElement('div');
+            div.className = 'sem-row';
+            div.innerHTML = `
+                <div class="input-wrapper">
+                    <label>Sem ${count} SGPA</label>
+                    <input type="number" class="sem-sgpa" placeholder="10.0" step="0.01">
+                </div>
+                <div class="input-wrapper">
+                    <label>Sem ${count} Credits</label>
+                    <input type="number" class="sem-credits" placeholder="20" step="0.5">
+                </div>
+                <button class="btn-remove" onclick="removeRow(this)" title="Remove">×</button>
+            `;
+            container.appendChild(div);
+            renumberLabels();
+        }
+
+        function removeRow(btn) {
+            btn.parentElement.remove();
+            renumberLabels();
+        }
+
+        function renumberLabels() {
+            const rows = document.querySelectorAll('.sem-row');
+            rows.forEach((row, index) => {
+                const labels = row.querySelectorAll('label');
+                labels[0].innerText = `Sem ${index + 1} SGPA`;
+                labels[1].innerText = `Sem ${index + 1} Credits`;
+            });
+        }
+
+        function calculate() {
+            // 1. Gather Past Data
+            let totalPastPoints = 0;
+            let totalPastCredits = 0;
+            
+            const sgpaInputs = document.querySelectorAll('.sem-sgpa');
+            const creditInputs = document.querySelectorAll('.sem-credits');
+            
+            let isValid = true;
+
+            for(let i=0; i<sgpaInputs.length; i++) {
+                const s = parseFloat(sgpaInputs[i].value);
+                const c = parseFloat(creditInputs[i].value);
+
+                if(!isNaN(s) && !isNaN(c)) {
+                    totalPastPoints += (s * c);
+                    totalPastCredits += c;
+                } else if (sgpaInputs[i].value !== "" || creditInputs[i].value !== "") {
+                    // If one field is filled but not the other in a row
+                    isValid = false;
+                }
+            }
+
+            // 2. Gather Current Sem Data
+            const currCreds = parseFloat(document.getElementById('currCredits').value);
+
+            if (isNaN(currCreds)) {
+                alert("Please enter credits for the Current Semester.");
+                return;
+            }
+            if (!isValid) {
+                alert("Please complete all Semester rows or remove empty ones.");
                 return;
             }
 
-            // 3. Logic setup
-            const totalPrevPoints = prevCgpa * prevCredits;
-            const totalNewCredits = prevCredits + currCredits;
-            const tableBody = document.getElementById('projection-body');
-            const summaryText = document.getElementById('summary-text');
-            
-            tableBody.innerHTML = ""; // Clear previous results
+            // 3. Current Statistics
+            const currentCGPA = totalPastCredits > 0 ? (totalPastPoints / totalPastCredits) : 0;
+            const finalTotalCredits = totalPastCredits + currCreds;
 
-            // 4. Update Summary
-            summaryText.innerHTML = `Total Credits after this sem: <span>${totalNewCredits}</span>`;
+            // Update UI Stats
+            document.getElementById('current-cgpa-display').innerText = currentCGPA.toFixed(2);
+            document.getElementById('total-credits-display').innerText = finalTotalCredits;
 
-            // 5. Generate Scenarios (From 10.0 down to 4.0 in steps of 0.2)
-            // We iterate down to show best scenarios first
-            for (let sgpa = 10.0; sgpa >= 4.0; sgpa -= 0.5) {
+            // 4. Generate Projections (Step 0.2)
+            const tbody = document.getElementById('projection-body');
+            tbody.innerHTML = "";
+
+            // Loop from 10.0 down to 4.0 in steps of 0.2
+            for (let targetSgpa = 10.0; targetSgpa >= 4.0; targetSgpa -= 0.2) {
+                // Fix floating point math issues (e.g. 9.80000001)
+                const sgpa = parseFloat(targetSgpa.toFixed(1)); 
+
+                const newPoints = sgpa * currCreds;
+                const grandTotalPoints = totalPastPoints + newPoints;
+                const projectedCgpa = grandTotalPoints / finalTotalCredits;
                 
-                // Calculate
-                const currentSemPoints = sgpa * currCredits;
-                const grandTotalPoints = totalPrevPoints + currentSemPoints;
-                const newCgpa = grandTotalPoints / totalNewCredits;
-
-                // Determine change direction
-                const diff = newCgpa - prevCgpa;
-                let changeIcon = "";
-                let changeClass = "";
+                // Calculate Difference
+                const diff = projectedCgpa - currentCGPA;
+                let diffStr = "";
+                let diffClass = "neutral";
 
                 if (diff > 0.001) {
-                    changeIcon = "▲ +" + diff.toFixed(2);
-                    changeClass = "high-impact";
+                    diffStr = "▲ " + diff.toFixed(3); // Showing 3 decimal places for precision
+                    diffClass = "gain";
                 } else if (diff < -0.001) {
-                    changeIcon = "▼ " + diff.toFixed(2);
-                    changeClass = "low-impact";
+                    diffStr = "▼ " + Math.abs(diff).toFixed(3);
+                    diffClass = "loss";
                 } else {
-                    changeIcon = "-";
-                    changeClass = "text-muted";
+                    diffStr = "-";
                 }
 
-                // Create Row
                 const row = `
                     <tr>
-                        <td style="font-weight:bold; color: white;">${sgpa.toFixed(1)}</td>
-                        <td style="font-size: 1.1em; font-weight:bold;">${newCgpa.toFixed(2)}</td>
-                        <td class="${changeClass}">${changeIcon}</td>
+                        <td style="font-weight:bold; color:#fff;">${sgpa}</td>
+                        <td style="font-size:1.1em;">${projectedCgpa.toFixed(2)}</td>
+                        <td class="${diffClass}" style="font-size:0.85em; font-weight:600;">${diffStr}</td>
                     </tr>
                 `;
-                tableBody.innerHTML += row;
+                tbody.innerHTML += row;
             }
 
-            // 6. Show Results
             document.getElementById('result-section').style.display = "block";
+            // Smooth scroll to results
+            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
         }
     </script>
 </body>
