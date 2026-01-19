@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGPA Projector</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #06b6d4; /* Cyan */
+            --accent-glow: rgba(6, 182, 212, 0.4);
+            --border: #334155;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--accent-glow);
+        }
+
+        /* Result Section */
+        #result-section {
+            margin-top: 2rem;
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s ease;
+        }
+
+        .summary {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .summary span {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: rgba(6, 182, 212, 0.1);
+            color: var(--accent);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Impact Colors */
+        .high-impact { color: var(--success); }
+        .low-impact { color: var(--danger); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>CGPA Projector</h1>
+        
+        <div class="input-group">
+            <label for="prevCgpa">Current CGPA (Till Previous Sem)</label>
+            <input type="number" id="prevCgpa" placeholder="e.g. 8.5" step="0.01" min="0" max="10">
+        </div>
+
+        <div class="input-group">
+            <label for="prevCredits">Total Credits Completed (Till Previous Sem)</label>
+            <input type="number" id="prevCredits" placeholder="e.g. 80" step="0.5" min="0">
+        </div>
+
+        <div class="input-group">
+            <label for="currCredits">Credits This Semester</label>
+            <input type="number" id="currCredits" placeholder="e.g. 24" step="0.5" min="0">
+        </div>
+
+        <button onclick="calculateProjection()">Calculate Scenarios</button>
+
+        <div id="result-section">
+            <div class="summary" id="summary-text">
+                </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>If Sem SGPA is</th>
+                        <th>New CGPA</th>
+                        <th>Change</th>
+                    </tr>
+                </thead>
+                <tbody id="projection-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function calculateProjection() {
+            // 1. Get Inputs
+            const prevCgpa = parseFloat(document.getElementById('prevCgpa').value);
+            const prevCredits = parseFloat(document.getElementById('prevCredits').value);
+            const currCredits = parseFloat(document.getElementById('currCredits').value);
+
+            // 2. Validation
+            if (isNaN(prevCgpa) || isNaN(prevCredits) || isNaN(currCredits)) {
+                alert("Please fill in all fields with valid numbers.");
+                return;
+            }
+
+            // 3. Logic setup
+            const totalPrevPoints = prevCgpa * prevCredits;
+            const totalNewCredits = prevCredits + currCredits;
+            const tableBody = document.getElementById('projection-body');
+            const summaryText = document.getElementById('summary-text');
+            
+            tableBody.innerHTML = ""; // Clear previous results
+
+            // 4. Update Summary
+            summaryText.innerHTML = `Total Credits after this sem: <span>${totalNewCredits}</span>`;
+
+            // 5. Generate Scenarios (From 10.0 down to 4.0 in steps of 0.2)
+            // We iterate down to show best scenarios first
+            for (let sgpa = 10.0; sgpa >= 4.0; sgpa -= 0.5) {
+                
+                // Calculate
+                const currentSemPoints = sgpa * currCredits;
+                const grandTotalPoints = totalPrevPoints + currentSemPoints;
+                const newCgpa = grandTotalPoints / totalNewCredits;
+
+                // Determine change direction
+                const diff = newCgpa - prevCgpa;
+                let changeIcon = "";
+                let changeClass = "";
+
+                if (diff > 0.001) {
+                    changeIcon = "▲ +" + diff.toFixed(2);
+                    changeClass = "high-impact";
+                } else if (diff < -0.001) {
+                    changeIcon = "▼ " + diff.toFixed(2);
+                    changeClass = "low-impact";
+                } else {
+                    changeIcon = "-";
+                    changeClass = "text-muted";
+                }
+
+                // Create Row
+                const row = `
+                    <tr>
+                        <td style="font-weight:bold; color: white;">${sgpa.toFixed(1)}</td>
+                        <td style="font-size: 1.1em; font-weight:bold;">${newCgpa.toFixed(2)}</td>
+                        <td class="${changeClass}">${changeIcon}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            }
+
+            // 6. Show Results
+            document.getElementById('result-section').style.display = "block";
+        }
+    </script>
+</body>
+</html>
