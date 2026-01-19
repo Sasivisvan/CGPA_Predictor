@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate CGPA Projector</title>
+    <title>Universal CGPA Projector</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -59,17 +59,53 @@
             text-align: center;
             color: var(--text-muted);
             font-size: 0.9rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
-        /* --- Dynamic Semester List --- */
+        /* --- Mode Switcher --- */
+        .mode-switch {
+            display: flex;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .mode-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .mode-option.active {
+            background: var(--accent);
+            color: #0f172a;
+            box-shadow: 0 2px 10px var(--accent-glow);
+        }
+
+        /* --- Input Sections --- */
+        .input-section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.3s ease;
+        }
+        .input-section.visible {
+            display: block;
+        }
+
+        /* Detailed Mode Styling */
         .sem-list {
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
-
         .sem-row {
             display: grid;
             grid-template-columns: 1fr 1fr auto;
@@ -79,16 +115,36 @@
             padding: 12px;
             border-radius: 8px;
             border: 1px solid var(--border);
-            animation: slideIn 0.3s ease;
+        }
+        .btn-remove {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--remove);
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; margin-bottom: 2px;
+            border: none; border-radius: 8px; cursor: pointer;
+        }
+        .btn-remove:hover { background: var(--danger); color: white; }
+
+        /* Quick Mode Styling */
+        .quick-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 1rem;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
 
+        /* Common Inputs */
         label {
             display: block;
             font-size: 0.75rem;
             color: var(--text-muted);
             margin-bottom: 6px;
         }
-
         input {
             width: 100%;
             padding: 10px;
@@ -99,76 +155,49 @@
             font-size: 0.95rem;
             transition: all 0.2s;
         }
-
         input:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 8px var(--accent-glow);
         }
 
-        /* --- Buttons --- */
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 2rem;
-        }
-
-        button {
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
-        }
-
-        button:active { transform: scale(0.98); }
-
+        /* Buttons */
         .btn-add {
+            width: 100%;
+            padding: 10px;
             background: var(--card-bg);
             border: 1px dashed var(--text-muted);
             color: var(--text-muted);
-            flex: 1;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
         }
-        .btn-add:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(6, 182, 212, 0.05);
-        }
+        .btn-add:hover { border-color: var(--accent); color: var(--accent); }
 
         .btn-calc {
             background: var(--accent);
             color: #0f172a;
-            flex: 1;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
             font-weight: 800;
             font-size: 1.1rem;
+            cursor: pointer;
             box-shadow: 0 4px 15px var(--accent-glow);
             margin-top: 1rem;
-            width: 100%;
+            transition: background 0.2s;
         }
         .btn-calc:hover { background: var(--accent-hover); }
 
-        .btn-remove {
-            background: rgba(244, 63, 94, 0.1);
-            color: var(--remove);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            margin-bottom: 2px;
-        }
-        .btn-remove:hover { background: var(--remove); color: white; }
-
-        /* --- Current Sem & Target Section --- */
-        .grid-2 {
+        /* --- Target & Current Sem Section --- */
+        .lower-inputs {
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            border-top: 1px solid var(--border);
-            padding-top: 1.5rem;
-            margin-bottom: 1rem;
         }
 
         .target-box {
@@ -178,7 +207,7 @@
             border-radius: 8px;
         }
 
-        /* --- Result Section --- */
+        /* --- Results --- */
         #result-section {
             display: none;
             margin-top: 2rem;
@@ -186,7 +215,6 @@
             padding-top: 1.5rem;
             animation: fadeIn 0.4s ease;
         }
-
         .target-result-card {
             background: rgba(255, 255, 255, 0.03);
             border-left: 4px solid var(--accent);
@@ -194,65 +222,49 @@
             border-radius: 4px;
             margin-bottom: 2rem;
         }
-        
-        .target-message {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            color: var(--text-main);
-        }
+        .target-message { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-main); }
+        .target-value { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
 
-        .target-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--accent);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th {
-            text-align: left;
-            color: var(--accent);
-            padding: 10px;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { text-align: left; color: var(--accent); padding: 10px; border-bottom: 1px solid var(--border); font-size: 0.8rem; text-transform: uppercase; }
+        td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .gain { color: var(--success); }
         .loss { color: var(--danger); }
         .neutral { color: var(--text-muted); }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Grade Planner</h1>
-        <p class="subtitle">Add past semesters & set your target.</p>
+        <h1>Grade Projector</h1>
+        <p class="subtitle">How would you like to enter your past grades?</p>
 
-        <div id="semesters-container" class="sem-list"></div>
-        <div class="btn-group">
-            <button class="btn-add" onclick="addSemesterRow()">+ Add Past Semester</button>
+        <div class="mode-switch">
+            <div class="mode-option active" onclick="switchMode('detailed')" id="tab-detailed">Detailed (By Sem)</div>
+            <div class="mode-option" onclick="switchMode('quick')" id="tab-quick">Quick (Total CGPA)</div>
         </div>
 
-        <div class="grid-2">
+        <div id="section-detailed" class="input-section visible">
+            <div id="semesters-container" class="sem-list"></div>
+            <button class="btn-add" onclick="addSemesterRow()">+ Add Semester Row</button>
+        </div>
+
+        <div id="section-quick" class="input-section">
+            <div class="quick-inputs">
+                <div class="input-wrapper">
+                    <label>Current CGPA</label>
+                    <input type="number" id="quick-cgpa" placeholder="e.g. 8.5" step="0.01" min="0" max="10">
+                </div>
+                <div class="input-wrapper">
+                    <label>Total Past Credits</label>
+                    <input type="number" id="quick-credits" placeholder="e.g. 80" step="0.5" min="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="lower-inputs">
             <div class="input-wrapper">
                 <label style="color:white; font-weight:600;">Current Sem Credits</label>
                 <input type="number" id="currCredits" placeholder="e.g. 24" step="0.5" min="0">
@@ -266,10 +278,7 @@
         <button class="btn-calc" onclick="calculate()">Calculate & Project</button>
 
         <div id="result-section">
-            
-            <div id="target-feedback" class="target-result-card">
-                </div>
-
+            <div id="target-feedback" class="target-result-card"></div>
             <h4 style="margin-bottom:10px; color:var(--text-muted);">Scenario Table</h4>
             <table>
                 <thead>
@@ -285,12 +294,30 @@
     </div>
 
     <script>
+        // State
+        let currentMode = 'detailed'; // 'detailed' or 'quick'
         const container = document.getElementById('semesters-container');
 
-        // Start with 1 empty row
+        // Initialize
         window.onload = function() {
-            addSemesterRow();
+            addSemesterRow(); // Add first row for detailed mode
         };
+
+        // --- UI Logic ---
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Toggle Tabs
+            document.getElementById('tab-detailed').className = mode === 'detailed' ? 'mode-option active' : 'mode-option';
+            document.getElementById('tab-quick').className = mode === 'quick' ? 'mode-option active' : 'mode-option';
+
+            // Toggle Sections
+            document.getElementById('section-detailed').className = mode === 'detailed' ? 'input-section visible' : 'input-section';
+            document.getElementById('section-quick').className = mode === 'quick' ? 'input-section visible' : 'input-section';
+
+            // Hide Results on switch (clean state)
+            document.getElementById('result-section').style.display = 'none';
+        }
 
         function addSemesterRow() {
             const count = container.children.length + 1;
@@ -325,138 +352,122 @@
             });
         }
 
+        // --- Calculation Logic ---
         function calculate() {
-            // --- 1. RESET STATE ---
-            // Clear previous outputs immediately to ensure fresh processing
-            const tbody = document.getElementById('projection-body');
-            const targetBox = document.getElementById('target-feedback');
-            const resultSection = document.getElementById('result-section');
-            
-            tbody.innerHTML = "";
-            targetBox.innerHTML = "";
-            resultSection.style.display = "none";
+            // 1. Reset Displays
+            document.getElementById('projection-body').innerHTML = "";
+            document.getElementById('target-feedback').innerHTML = "";
+            document.getElementById('result-section').style.display = "none";
 
-            // --- 2. GATHER FRESH DATA ---
-            // We define variables inside function scope so they are never stale
+            // 2. Fetch Past Data based on Mode
             let totalPastPoints = 0;
             let totalPastCredits = 0;
-            let isValid = true;
+            let currentCgpa = 0;
 
-            const sgpaInputs = document.querySelectorAll('.sem-sgpa');
-            const creditInputs = document.querySelectorAll('.sem-credits');
+            if (currentMode === 'detailed') {
+                const sgpaInputs = document.querySelectorAll('.sem-sgpa');
+                const creditInputs = document.querySelectorAll('.sem-credits');
+                let validRows = 0;
 
-            for(let i=0; i<sgpaInputs.length; i++) {
-                const s = parseFloat(sgpaInputs[i].value);
-                const c = parseFloat(creditInputs[i].value);
-
-                // Only count complete rows
-                if(!isNaN(s) && !isNaN(c)) {
-                    totalPastPoints += (s * c);
-                    totalPastCredits += c;
-                } else if (sgpaInputs[i].value !== "" || creditInputs[i].value !== "") {
-                    isValid = false; // Half-filled row
+                for(let i=0; i<sgpaInputs.length; i++) {
+                    const s = parseFloat(sgpaInputs[i].value);
+                    const c = parseFloat(creditInputs[i].value);
+                    if(!isNaN(s) && !isNaN(c)) {
+                        totalPastPoints += (s * c);
+                        totalPastCredits += c;
+                        validRows++;
+                    }
                 }
+                if (validRows === 0) {
+                    alert("Please enter at least one past semester row.");
+                    return;
+                }
+                currentCgpa = totalPastPoints / totalPastCredits;
+
+            } else {
+                // Quick Mode
+                const qCgpa = parseFloat(document.getElementById('quick-cgpa').value);
+                const qCredits = parseFloat(document.getElementById('quick-credits').value);
+                
+                if (isNaN(qCgpa) || isNaN(qCredits)) {
+                    alert("Please enter both Current CGPA and Total Past Credits.");
+                    return;
+                }
+                currentCgpa = qCgpa;
+                totalPastCredits = qCredits;
+                totalPastPoints = qCgpa * qCredits;
             }
 
+            // 3. Fetch Common Data
             const currCredits = parseFloat(document.getElementById('currCredits').value);
             const targetCgpa = parseFloat(document.getElementById('targetCgpa').value);
 
-            // Validation
             if (isNaN(currCredits)) {
                 alert("Please enter Current Semester Credits.");
                 return;
             }
-            if (!isValid) {
-                alert("Please ensure all Semester rows are fully filled or removed.");
-                return;
-            }
 
-            // --- 3. CORE CALCULATIONS ---
+            // 4. Target Calculation
             const totalFutureCredits = totalPastCredits + currCredits;
-            const currentCgpa = totalPastCredits > 0 ? (totalPastPoints / totalPastCredits) : 0;
+            const targetBox = document.getElementById('target-feedback');
 
-            // --- 4. TARGET ANALYSIS ---
             if (!isNaN(targetCgpa)) {
-                // Formula: RequiredPoints = (TargetCGPA * TotalCredits) - PastPoints
-                // RequiredSGPA = RequiredPoints / CurrentCredits
                 const requiredTotalPoints = targetCgpa * totalFutureCredits;
                 const pointsNeeded = requiredTotalPoints - totalPastPoints;
                 const requiredSgpa = pointsNeeded / currCredits;
 
-                let feedbackHtml = "";
-
+                let html = "";
                 if (requiredSgpa > 10.0) {
-                    const maxPossiblePoints = totalPastPoints + (10 * currCredits);
-                    const maxPossibleCgpa = maxPossiblePoints / totalFutureCredits;
-                    
-                    feedbackHtml = `
-                        <div class="target-message" style="color: var(--danger)">Goal Unreachable</div>
-                        <div style="color: #cbd5e1; margin-bottom:5px;">
-                            You need <span style="color:var(--danger); font-weight:bold;">${requiredSgpa.toFixed(2)} SGPA</span>.
-                        </div>
-                        <div style="font-size:0.9rem; color: var(--text-muted)">
-                            Even with 10.0 SGPA, your max CGPA will be <span style="color:white; font-weight:bold;">${maxPossibleCgpa.toFixed(2)}</span>.
-                        </div>
+                    const maxCgpa = (totalPastPoints + (10 * currCredits)) / totalFutureCredits;
+                    html = `
+                        <div class="target-message" style="color:var(--danger)">Goal Unreachable</div>
+                        <div style="color:#cbd5e1">Requires <span style="color:var(--danger);font-weight:bold">${requiredSgpa.toFixed(2)} SGPA</span></div>
+                        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px">Max possible CGPA is <b>${maxCgpa.toFixed(2)}</b></div>
                     `;
                 } else if (requiredSgpa <= 0) {
-                     feedbackHtml = `
-                        <div class="target-message" style="color: var(--success)">Goal Secured</div>
-                        <div style="color: #cbd5e1;">
-                            You are already above this target based on past performance.
-                        </div>
-                    `;
+                    html = `<div class="target-message" style="color:var(--success)">Goal Secured</div><div style="color:#cbd5e1">You're already above target.</div>`;
                 } else {
-                    feedbackHtml = `
+                    html = `
                         <div class="target-message">To reach <span style="color:white">${targetCgpa}</span> CGPA</div>
-                        <div style="color: #cbd5e1; margin-bottom: 5px;">You need to score at least:</div>
+                        <div style="color:#cbd5e1">You need to score:</div>
                         <div class="target-value">${requiredSgpa.toFixed(2)} SGPA</div>
                     `;
                 }
-                targetBox.innerHTML = feedbackHtml;
+                targetBox.innerHTML = html;
             } else {
-                targetBox.innerHTML = `<div style="color:var(--text-muted); font-style:italic;">Enter a Target CGPA above to see requirements.</div>`;
+                targetBox.innerHTML = `<div style="color:var(--text-muted); font-style:italic">Enter a Target CGPA to see requirements.</div>`;
             }
 
-            // --- 5. SCENARIO PROJECTION LOOP ---
+            // 5. Projection Loop
+            const tbody = document.getElementById('projection-body');
             for (let sgpa = 10.0; sgpa >= 4.0; sgpa -= 0.2) {
-                const s = parseFloat(sgpa.toFixed(1)); // clean float
+                const s = parseFloat(sgpa.toFixed(1));
                 const grandTotal = totalPastPoints + (s * currCredits);
                 const projected = grandTotal / totalFutureCredits;
                 
-                // Diff logic
                 const diff = projected - currentCgpa;
-                let diffStr = "-";
-                let diffClass = "neutral";
+                let diffStr = "-", diffClass = "neutral";
+                
+                if (diff > 0.001) { diffStr = "▲ " + diff.toFixed(3); diffClass = "gain"; }
+                else if (diff < -0.001) { diffStr = "▼ " + Math.abs(diff).toFixed(3); diffClass = "loss"; }
 
-                if (totalPastCredits > 0) {
-                    if (diff > 0.001) {
-                        diffStr = "▲ " + diff.toFixed(3);
-                        diffClass = "gain";
-                    } else if (diff < -0.001) {
-                        diffStr = "▼ " + Math.abs(diff).toFixed(3);
-                        diffClass = "loss";
-                    }
-                }
-
-                // Highlight row if it meets target
+                // Check goal hit
                 let rowStyle = "";
                 if (!isNaN(targetCgpa) && projected >= targetCgpa - 0.001) {
                     rowStyle = "background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success);";
                 }
 
-                const row = `
+                tbody.innerHTML += `
                     <tr style="${rowStyle}">
                         <td style="font-weight:bold; color:white;">${s}</td>
                         <td style="font-size:1.1em; font-weight:bold;">${projected.toFixed(2)}</td>
                         <td class="${diffClass}">${diffStr}</td>
                     </tr>
                 `;
-                tbody.innerHTML += row;
             }
 
-            // --- 6. DISPLAY RESULTS ---
-            resultSection.style.display = "block";
-            targetBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('result-section').style.display = "block";
+            document.getElementById('target-feedback').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     </script>
 </body>
