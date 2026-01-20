@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade Projector Pro</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Grade Projector</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -17,6 +16,7 @@
             --accent-glow: rgba(56, 189, 248, 0.3);
             --success: #22c55e;
             --danger: #ef4444;
+            --warning: #f59e0b;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -33,13 +33,20 @@
         .container { width: 100%; max-width: 600px; }
 
         /* Header */
-        header { text-align: center; margin-bottom: 2.5rem; }
+        header { text-align: center; margin-bottom: 2rem; position: relative; }
         h1 {
             font-weight: 800; font-size: 2rem; letter-spacing: -1px; margin-bottom: 0.5rem;
             background: linear-gradient(135deg, #fff, var(--accent));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         p.subtitle { color: var(--text-muted); font-size: 0.95rem; }
+        
+        /* Reset Button */
+        .reset-link {
+            font-size: 0.8rem; color: var(--danger); text-decoration: underline; 
+            cursor: pointer; opacity: 0.7; margin-top: 10px; display: inline-block;
+        }
+        .reset-link:hover { opacity: 1; }
 
         /* Step Cards */
         .step-card {
@@ -133,18 +140,14 @@
         .result-stat div { font-size: 1.4rem; font-weight: 800; color: white; }
 
         .feedback-box {
-            padding: 15px; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;
+            padding: 15px; border-radius: 8px; margin-bottom: 1rem; text-align: center;
             background: rgba(255,255,255,0.03);
-        }
-
-        /* Chart Container */
-        .chart-wrapper {
-            background: #111827;
-            padding: 15px;
-            border-radius: 12px;
             border: 1px solid var(--card-border);
-            margin-bottom: 2rem;
-            height: 250px;
+        }
+        
+        .difficulty-badge {
+            display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
         }
 
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
@@ -160,6 +163,7 @@
         <header>
             <h1>Grade Projector</h1>
             <p class="subtitle">Plan your academic comeback.</p>
+            <div class="reset-link" onclick="resetData()">Reset Data</div>
         </header>
 
         <div class="step-card">
@@ -214,7 +218,7 @@
             </div>
         </div>
 
-        <button class="btn-calc" onclick="calc()">Calculate & Visualize</button>
+        <button class="btn-calc" onclick="calc()">Calculate Projection</button>
 
         <div id="result-area">
             <div class="result-header">
@@ -234,10 +238,6 @@
 
             <div id="feedback" class="feedback-box"></div>
 
-            <div class="chart-wrapper">
-                <canvas id="gradeChart"></canvas>
-            </div>
-
             <h4 style="margin-bottom:10px; color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">Performance Scenarios</h4>
             <table>
                 <thead>
@@ -255,22 +255,19 @@
     <script>
         // --- State & Config ---
         let mode = 'detailed';
-        let chartInstance = null;
         const container = document.getElementById('rows-container');
 
         // --- Persistence (Load) ---
         window.onload = () => {
-            const saved = localStorage.getItem('gradeProj_v4');
+            const saved = localStorage.getItem('gradeProj_v5');
             if (saved) {
                 const s = JSON.parse(saved);
                 mode = s.mode || 'detailed';
                 setMode(mode);
 
-                // Load Quick
                 document.getElementById('q-cgpa').value = s.quick.cgpa;
                 document.getElementById('q-credits').value = s.quick.credits;
 
-                // Load Future
                 if(s.future.strat) {
                     const r = document.querySelector(`input[name="strat"][value="${s.future.strat}"]`);
                     if(r) r.checked = true;
@@ -278,18 +275,24 @@
                 document.getElementById('f-credits').value = s.future.credits;
                 document.getElementById('target').value = s.future.target;
 
-                // Load Rows
                 container.innerHTML = "";
                 if(s.rows && s.rows.length > 0) {
                     s.rows.forEach(r => addRow(r.s, r.c));
                 } else {
-                    addRow(); // Default if no rows
+                    addRow(); 
                 }
             } else {
-                addRow(); // Default start
+                addRow(); 
             }
             updStrat();
         };
+
+        function resetData() {
+            if(confirm("Clear all data and start over?")) {
+                localStorage.removeItem('gradeProj_v5');
+                location.reload();
+            }
+        }
 
         // --- Persistence (Save) ---
         function saveState() {
@@ -312,7 +315,7 @@
                     c: row.querySelector('.r-cred').value
                 });
             });
-            localStorage.setItem('gradeProj_v4', JSON.stringify(state));
+            localStorage.setItem('gradeProj_v5', JSON.stringify(state));
         }
 
         // --- UI Functions ---
@@ -351,32 +354,22 @@
             }
         }
 
-        // --- Math & Chart Logic ---
+        // --- Math Logic ---
         function calc() {
-            saveState(); // Ensure saved before calc
+            saveState();
             
             // 1. Get Past Data
             let pPoints = 0, pCreds = 0;
-            let historySgpa = []; // For chart
-            
             if (mode === 'detailed') {
                 document.querySelectorAll('.sem-row').forEach(row => {
                     const s = parseFloat(row.querySelector('.r-sgpa').value);
                     const c = parseFloat(row.querySelector('.r-cred').value);
-                    if(!isNaN(s) && !isNaN(c)) { 
-                        pPoints += s*c; 
-                        pCreds += c; 
-                        historySgpa.push(s);
-                    }
+                    if(!isNaN(s) && !isNaN(c)) { pPoints += s*c; pCreds += c; }
                 });
             } else {
                 const cg = parseFloat(document.getElementById('q-cgpa').value);
                 const cr = parseFloat(document.getElementById('q-credits').value);
-                if(!isNaN(cg) && !isNaN(cr)) { 
-                    pPoints = cg*cr; 
-                    pCreds = cr; 
-                    historySgpa.push(cg); // In quick mode, we only have one point
-                }
+                if(!isNaN(cg) && !isNaN(cr)) { pPoints = cg*cr; pCreds = cr; }
             }
 
             if(pCreds === 0) return alert("Please enter valid past grades.");
@@ -406,35 +399,50 @@
             document.getElementById('out-goal').innerText = isNaN(target) ? "--" : target;
             document.getElementById('result-area').style.display = "block";
 
-            // 4. Target Analysis & Chart Prep
+            // 4. Target Analysis with Difficulty Logic
             const box = document.getElementById('feedback');
-            let requiredSGPA = 0;
-
+            
             if(!isNaN(target)) {
                 const reqPoints = (target * totalCreds) - pPoints;
-                requiredSGPA = reqPoints / credsToEarn;
+                const reqSGPA = reqPoints / credsToEarn;
                 const maxCGPA = (pPoints + (10 * credsToEarn)) / totalCreds;
 
-                if(requiredSGPA > 10) {
-                    box.innerHTML = `<span style="color:var(--danger); font-weight:bold;">Impossible</span><br><span style="color:#94a3b8; font-size:0.9rem">Max possible is ${maxCGPA.toFixed(2)}</span>`;
-                    box.style.border = "1px solid var(--danger)";
-                } else if (requiredSGPA <= 0) {
-                    box.innerHTML = `<span style="color:var(--success); font-weight:bold;">Goal Secured</span>`;
-                    box.style.border = "1px solid var(--success)";
-                    requiredSGPA = 0; // Clamp for chart
+                // Difficulty Calculation
+                let diffText = "", diffColor = "", diffBg = "";
+                const gap = reqSGPA - currCGPA;
+
+                if (reqSGPA > 10) {
+                    diffText = "IMPOSSIBLE"; diffColor = "#ef4444"; diffBg = "rgba(239, 68, 68, 0.2)";
+                } else if (reqSGPA <= currCGPA) {
+                    diffText = "COMFORTABLE"; diffColor = "#22c55e"; diffBg = "rgba(34, 197, 94, 0.2)";
+                } else if (gap < 0.5) {
+                    diffText = "EASY REACH"; diffColor = "#38bdf8"; diffBg = "rgba(56, 189, 248, 0.2)";
+                } else if (gap < 1.0) {
+                    diffText = "MODERATE"; diffColor = "#f59e0b"; diffBg = "rgba(245, 158, 11, 0.2)";
                 } else {
-                    box.innerHTML = `Need <b>${requiredSGPA.toFixed(2)}</b> SGPA <span style="color:#94a3b8; font-size:0.85rem">(${strat === 'next' ? 'Next Sem' : 'Avg for rest'})</span>`;
-                    box.style.border = "1px solid var(--accent)";
+                    diffText = "HARD GRIND"; diffColor = "#f43f5e"; diffBg = "rgba(244, 63, 94, 0.2)";
+                }
+
+                if(reqSGPA > 10) {
+                    box.innerHTML = `
+                        <div style="color:var(--danger); font-weight:bold; font-size:1.1rem">Goal Unreachable</div>
+                        <div style="color:#94a3b8; font-size:0.9rem; margin-top:4px">Max possible is ${maxCGPA.toFixed(2)}</div>
+                    `;
+                    box.style.border = "1px solid var(--danger)";
+                } else {
+                    box.innerHTML = `
+                        <div style="font-size:0.9rem; color:var(--text-muted)">Required Performance</div>
+                        <div style="font-size:1.8rem; font-weight:800; color:white; margin:5px 0;">${reqSGPA.toFixed(2)} <span style="font-size:1rem; color:var(--text-muted)">SGPA</span></div>
+                        <div class="difficulty-badge" style="background:${diffBg}; color:${diffColor}">${diffText}</div>
+                    `;
+                    box.style.border = "1px solid " + diffColor;
                 }
             } else {
                 box.innerHTML = "Enter a goal to see requirements.";
                 box.style.border = "1px solid var(--card-border)";
             }
 
-            // 5. Render Chart
-            renderChart(historySgpa, requiredSGPA, strat);
-
-            // 6. Table
+            // 5. Table
             const tbody = document.getElementById('table-body');
             tbody.innerHTML = "";
             for(let s = 10; s >= 4; s -= 0.5) {
@@ -457,77 +465,6 @@
             }
 
             document.getElementById('result-area').scrollIntoView({behavior:'smooth'});
-        }
-
-        function renderChart(history, required, strat) {
-            const ctx = document.getElementById('gradeChart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-
-            // Prepare Labels and Data
-            let labels = [];
-            let dataPoints = [...history];
-            let pointColors = Array(history.length).fill('#38bdf8'); // Blue for past
-
-            // Past Labels
-            if(mode === 'detailed') {
-                history.forEach((_, i) => labels.push(`Sem ${i+1}`));
-            } else {
-                labels.push("Current Avg");
-            }
-
-            // Future Point (if target exists)
-            if(required > 0) {
-                labels.push(strat === 'next' ? "Next Sem Goal" : "Avg Required");
-                dataPoints.push(required);
-                pointColors.push(required > 10 ? '#ef4444' : '#22c55e'); // Red if impossible, Green if goal
-            }
-
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Performance Trajectory',
-                        data: dataPoints,
-                        borderColor: '#38bdf8',
-                        backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                        pointBackgroundColor: pointColors,
-                        pointBorderColor: '#fff',
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        borderWidth: 3,
-                        tension: 0.3,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            titleColor: '#fff',
-                            bodyColor: '#cbd5e1',
-                            borderColor: '#334155',
-                            borderWidth: 1
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            min: 4,
-                            max: 10,
-                            grid: { color: '#334155' },
-                            ticks: { color: '#94a3b8' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#94a3b8' }
-                        }
-                    }
-                }
-            });
         }
     </script>
 </body>
