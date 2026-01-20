@@ -3,569 +3,417 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal CGPA Projector v2</title>
+    <title>Grade Projector Pro</title>
     <style>
         :root {
+            /* Modernized Dark Palette */
             --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
+            --card-surface: #1e293b;
+            --card-border: #334155;
+            --input-bg: #334155; 
+            --text-main: #f1f5f9;
             --text-muted: #94a3b8;
-            --accent: #06b6d4;
-            --accent-hover: #0891b2;
-            --accent-glow: rgba(6, 182, 212, 0.25);
-            --border: #334155;
-            --success: #10b981;
+            --accent: #38bdf8; /* Brighter Blue */
+            --accent-hover: #0ea5e9;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --success: #22c55e;
             --danger: #ef4444;
-            --warning: #f59e0b;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: flex-start;
             min-height: 100vh;
             padding: 40px 20px;
         }
 
         .container {
             width: 100%;
-            max-width: 650px;
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            border: 1px solid var(--border);
+            max-width: 600px;
         }
 
+        /* Header */
+        header { text-align: center; margin-bottom: 2.5rem; }
         h1 {
-            text-align: center;
-            margin-bottom: 0.5rem;
             font-weight: 800;
-            background: linear-gradient(90deg, #fff, var(--accent));
+            font-size: 2rem;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff, var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        p.subtitle { color: var(--text-muted); font-size: 0.95rem; }
 
-        p.subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
+        /* Step Cards */
+        .step-card {
+            background: var(--card-surface);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
             margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
         }
 
-        /* --- Mode Switcher (Detailed vs Quick) --- */
-        .mode-switch {
-            display: flex;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            padding: 4px;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .mode-option {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            transition: all 0.3s ease;
-        }
-
-        .mode-option.active {
+        .step-badge {
+            position: absolute;
+            top: -12px;
+            left: 20px;
             background: var(--accent);
             color: #0f172a;
-            box-shadow: 0 2px 10px var(--accent-glow);
-        }
-
-        /* --- Input Sections --- */
-        .input-section {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        .input-section.visible { display: block; }
-
-        .sem-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        .sem-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 10px;
-            align-items: end;
-            background: rgba(0,0,0,0.2);
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .btn-remove {
-            background: rgba(244, 63, 94, 0.1);
-            color: var(--danger);
-            width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem;
-            border: none; border-radius: 8px; cursor: pointer;
-        }
-        .btn-remove:hover { background: var(--danger); color: white; }
-
-        .quick-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 1rem;
-            background: rgba(0,0,0,0.2);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        /* Common Inputs */
-        label {
-            display: block;
             font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: rgba(0,0,0,0.2);
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 1.2rem;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .tab.active { background: var(--input-bg); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        /* Inputs */
+        .input-group { margin-bottom: 1rem; position: relative; }
+        label {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px;
         }
         input {
             width: 100%;
-            padding: 10px;
-            background: #0f172a;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: white;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-        }
-        input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 8px var(--accent-glow);
-        }
-
-        /* Buttons */
-        .btn-add {
-            width: 100%;
-            padding: 10px;
-            background: var(--card-bg);
-            border: 1px dashed var(--text-muted);
-            color: var(--text-muted);
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid transparent;
             border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--accent); background: #1e293b; }
+
+        /* The 'i' Button */
+        .info-btn {
+            display: inline-flex;
+            align-items: center; justify-content: center;
+            width: 18px; height: 18px;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: serif; /* For the 'i' look */
+            text-decoration: none;
             cursor: pointer;
-            margin-bottom: 1.5rem;
+            transition: 0.2s;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        .info-btn:hover { background: var(--accent); color: #0f172a; transform: scale(1.1); }
+
+        /* Detailed Rows */
+        .sem-row {
+            display: flex; gap: 10px; margin-bottom: 10px;
+            background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px;
+        }
+        .btn-mini {
+            padding: 0 12px; background: rgba(239, 68, 68, 0.15); color: var(--danger);
+            border: none; border-radius: 6px; cursor: pointer; font-size: 1.2rem;
+        }
+        .btn-add {
+            width: 100%; padding: 10px; border: 1px dashed var(--text-muted);
+            background: transparent; color: var(--text-muted); border-radius: 8px; cursor: pointer;
         }
         .btn-add:hover { border-color: var(--accent); color: var(--accent); }
 
+        /* Strategy Radio */
+        .strategy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+        .radio-card {
+            background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;
+            text-align: center; cursor: pointer; border: 1px solid transparent; font-size: 0.85rem; color: var(--text-muted);
+        }
+        .radio-card input { display: none; }
+        .radio-card:has(input:checked) {
+            background: rgba(56, 189, 248, 0.1); border-color: var(--accent); color: var(--accent); font-weight: bold;
+        }
+
+        /* Calculate Button */
         .btn-calc {
-            background: var(--accent);
-            color: #0f172a;
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 15px var(--accent-glow);
-            margin-top: 1rem;
-            transition: background 0.2s;
+            width: 100%; padding: 16px; background: var(--accent); color: #0f172a;
+            border: none; border-radius: 12px; font-weight: 800; font-size: 1.1rem;
+            cursor: pointer; box-shadow: 0 0 20px var(--accent-glow); transition: 0.2s;
         }
-        .btn-calc:hover { background: var(--accent-hover); }
+        .btn-calc:hover { transform: translateY(-2px); box-shadow: 0 5px 25px var(--accent-glow); }
 
-        /* --- Strategy Toggle (New) --- */
-        .strategy-container {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
+        /* Results */
+        #result-area { display: none; margin-top: 2rem; animation: slideUp 0.4s ease; }
+        .result-header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #111827; padding: 15px; border-radius: 12px; border: 1px solid var(--card-border);
+            margin-bottom: 1.5rem;
         }
-        
-        .strategy-toggle {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 1rem;
-        }
-        
-        .radio-label {
-            flex: 1;
-            background: rgba(255,255,255,0.05);
-            padding: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            text-align: center;
-            border: 1px solid transparent;
-            color: var(--text-muted);
-        }
-        
-        /* Hide actual radio buttons */
-        .radio-label input { display: none; }
-        
-        .radio-label:has(input:checked) {
-            background: rgba(6, 182, 212, 0.15);
-            border-color: var(--accent);
-            color: var(--accent);
-            font-weight: bold;
-        }
+        .result-stat h4 { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
+        .result-stat div { font-size: 1.4rem; font-weight: 800; color: white; }
 
-        .lower-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .feedback-box {
+            padding: 15px; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;
+            background: rgba(255,255,255,0.03);
         }
-
-        .target-box {
-            background: rgba(6, 182, 212, 0.05);
-            border: 1px solid rgba(6, 182, 212, 0.2);
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        /* --- Results --- */
-        #result-section {
-            display: none;
-            margin-top: 2rem;
-            border-top: 1px solid var(--border);
-            padding-top: 1.5rem;
-            animation: fadeIn 0.4s ease;
-        }
-        
-        /* Current Status Card (New) */
-        .status-card {
-            display: flex;
-            justify-content: space-between;
-            background: #0f172a;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            margin-bottom: 1rem;
-        }
-        .status-item { text-align: center; }
-        .status-label { font-size: 0.8rem; color: var(--text-muted); }
-        .status-val { font-size: 1.2rem; font-weight: bold; color: white; }
-
-        .target-result-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 4px solid var(--accent);
-            padding: 1rem;
-            border-radius: 4px;
-            margin-bottom: 2rem;
-        }
-        .target-message { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-main); }
-        .target-value { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
 
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th { text-align: left; color: var(--accent); padding: 10px; border-bottom: 1px solid var(--border); font-size: 0.8rem; text-transform: uppercase; }
-        td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .gain { color: var(--success); }
-        .loss { color: var(--danger); }
-        .neutral { color: var(--text-muted); }
+        th { text-align: left; padding: 10px; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--card-border); }
+        td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>CGPA Projector</h1>
-        <p class="subtitle">Enter grades to see your status and plan ahead.</p>
+        <header>
+            <h1>Grade Projector</h1>
+            <p class="subtitle">Plan your academic comeback.</p>
+        </header>
 
-        <div class="mode-switch">
-            <div class="mode-option active" onclick="switchMode('detailed')" id="tab-detailed">Detailed (By Sem)</div>
-            <div class="mode-option" onclick="switchMode('quick')" id="tab-quick">Quick Input</div>
-        </div>
+        <div class="step-card">
+            <div class="step-badge">Step 1: History</div>
+            <div class="tabs">
+                <div class="tab active" onclick="setMode('detailed')" id="tab-det">Detailed Input</div>
+                <div class="tab" onclick="setMode('quick')" id="tab-q">Quick Input</div>
+            </div>
 
-        <div id="section-detailed" class="input-section visible">
-            <div id="semesters-container" class="sem-list"></div>
-            <button class="btn-add" onclick="addSemesterRow()">+ Add Semester Row</button>
-        </div>
+            <div id="mode-detailed">
+                <div id="rows-container"></div>
+                <button class="btn-add" onclick="addRow()">+ Add Semester</button>
+            </div>
 
-        <div id="section-quick" class="input-section">
-            <div class="quick-inputs">
-                <div class="input-wrapper">
+            <div id="mode-quick" style="display:none;">
+                <div class="input-group">
                     <label>Current CGPA</label>
-                    <input type="number" id="quick-cgpa" placeholder="e.g. 8.5" step="0.01">
+                    <input type="number" id="q-cgpa" placeholder="e.g. 8.4" step="0.01">
                 </div>
-                <div class="input-wrapper">
+                <div class="input-group">
                     <label>Total Past Credits</label>
-                    <input type="number" id="quick-credits" placeholder="e.g. 80" step="0.5">
+                    <input type="number" id="q-credits" placeholder="e.g. 82" step="0.5">
                 </div>
             </div>
         </div>
 
-        <div class="strategy-container">
-            <label style="margin-bottom:10px;">What are we calculating for?</label>
-            <div class="strategy-toggle">
-                <label class="radio-label">
-                    <input type="radio" name="strategy" value="next" checked onchange="toggleStrategy()">
+        <div class="step-card">
+            <div class="step-badge">Step 2: Strategy</div>
+            
+            <div class="strategy-grid">
+                <label class="radio-card">
+                    <input type="radio" name="strat" value="next" checked onchange="updStrat()">
                     Next Sem Only
                 </label>
-                <label class="radio-label">
-                    <input type="radio" name="strategy" value="degree" onchange="toggleStrategy()">
+                <label class="radio-card">
+                    <input type="radio" name="strat" value="degree" onchange="updStrat()">
                     Rest of Degree
                 </label>
             </div>
 
-            <div class="lower-inputs">
-                <div class="input-wrapper" id="credits-wrapper">
-                    <label style="color:white; font-weight:600;" id="credit-label">Next Sem Credits</label>
-                    <input type="number" id="futureCredits" placeholder="e.g. 24" step="0.5" min="0">
-                </div>
-                
-                <div class="input-wrapper target-box">
-                    <label style="color:var(--accent); font-weight:600;">Target CGPA (Goal)</label>
-                    <input type="number" id="targetCgpa" placeholder="e.g. 9.0" step="0.01" min="0" max="10">
-                </div>
+            <div class="input-group">
+                <label id="lbl-credits">
+                    Next Sem Credits
+                    <a href="https://your-college-timetable-link.com" target="_blank" class="info-btn" title="View Timetable">i</a>
+                </label>
+                <input type="number" id="f-credits" placeholder="e.g. 24" step="0.5">
+            </div>
+
+            <div class="input-group">
+                <label>Target CGPA Goal</label>
+                <input type="number" id="target" placeholder="e.g. 9.0" step="0.01" style="border-color: var(--accent);">
             </div>
         </div>
 
-        <button class="btn-calc" onclick="calculate()">Calculate & Project</button>
+        <button class="btn-calc" onclick="calc()">Calculate Projection</button>
 
-        <div id="result-section">
-            
-            <div class="status-card">
-                <div class="status-item">
-                    <div class="status-label">Current CGPA</div>
-                    <div class="status-val" id="disp-curr-cgpa">--</div>
+        <div id="result-area">
+            <div class="result-header">
+                <div class="result-stat">
+                    <h4>Current CGPA</h4>
+                    <div id="out-curr">--</div>
                 </div>
-                <div class="status-item">
-                    <div class="status-label">Past Credits</div>
-                    <div class="status-val" id="disp-past-credits">--</div>
+                <div class="result-stat">
+                    <h4>Past Credits</h4>
+                    <div id="out-cred">--</div>
                 </div>
-                <div class="status-item">
-                    <div class="status-label">Mode</div>
-                    <div class="status-val" style="color:var(--accent); font-size:1rem; padding-top:2px;" id="disp-mode">--</div>
+                <div class="result-stat" style="text-align:right;">
+                    <h4>Goal</h4>
+                    <div id="out-goal" style="color:var(--accent)">--</div>
                 </div>
             </div>
 
-            <div id="target-feedback" class="target-result-card"></div>
-            
-            <h4 style="margin-bottom:10px; color:var(--text-muted);">Scenario Table</h4>
+            <div id="feedback" class="feedback-box"></div>
+
             <table>
                 <thead>
                     <tr>
-                        <th id="th-perform">If Performance</th>
+                        <th>Performance</th>
                         <th>New CGPA</th>
-                        <th>Impact</th>
+                        <th>Change</th>
                     </tr>
                 </thead>
-                <tbody id="projection-body"></tbody>
+                <tbody id="table-body"></tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // State
-        let currentMode = 'detailed'; // 'detailed' or 'quick'
-        const container = document.getElementById('semesters-container');
+        // --- Configuration ---
+        let mode = 'detailed';
+        const container = document.getElementById('rows-container');
 
-        // Initialize
-        window.onload = function() {
-            addSemesterRow(); 
-            toggleStrategy(); // Set initial labels
-        };
+        // Init
+        window.onload = () => { addRow(); updStrat(); };
 
-        // --- UI Logic ---
-        function switchMode(mode) {
-            currentMode = mode;
-            document.getElementById('tab-detailed').className = mode === 'detailed' ? 'mode-option active' : 'mode-option';
-            document.getElementById('tab-quick').className = mode === 'quick' ? 'mode-option active' : 'mode-option';
-            document.getElementById('section-detailed').className = mode === 'detailed' ? 'input-section visible' : 'input-section';
-            document.getElementById('section-quick').className = mode === 'quick' ? 'input-section visible' : 'input-section';
-            document.getElementById('result-section').style.display = 'none';
+        // --- UI Functions ---
+        function setMode(m) {
+            mode = m;
+            document.getElementById('tab-det').className = m === 'detailed' ? 'tab active' : 'tab';
+            document.getElementById('tab-q').className = m === 'quick' ? 'tab active' : 'tab';
+            document.getElementById('mode-detailed').style.display = m === 'detailed' ? 'block' : 'none';
+            document.getElementById('mode-quick').style.display = m === 'quick' ? 'block' : 'none';
         }
 
-        function toggleStrategy() {
-            const strategy = document.querySelector('input[name="strategy"]:checked').value;
-            const label = document.getElementById('credit-label');
-            const input = document.getElementById('futureCredits');
-            
-            if (strategy === 'next') {
-                label.innerText = "Next Sem Credits";
-                input.placeholder = "e.g. 24";
-            } else {
-                label.innerText = "Total Course Credits";
-                input.placeholder = "e.g. 160 (Total for 4 years)";
-            }
-        }
-
-        function addSemesterRow() {
-            const count = container.children.length + 1;
+        function addRow() {
+            const idx = container.children.length + 1;
             const div = document.createElement('div');
             div.className = 'sem-row';
             div.innerHTML = `
-                <div class="input-wrapper">
-                    <label>Sem ${count} SGPA</label>
-                    <input type="number" class="sem-sgpa" placeholder="0-10" step="0.01">
-                </div>
-                <div class="input-wrapper">
-                    <label>Sem ${count} Credits</label>
-                    <input type="number" class="sem-credits" placeholder="Credit" step="0.5">
-                </div>
-                <button class="btn-remove" onclick="removeRow(this)" title="Remove">×</button>
+                <div style="flex:1"><input type="number" class="r-sgpa" placeholder="SGPA Sem ${idx}" step="0.01"></div>
+                <div style="flex:1"><input type="number" class="r-cred" placeholder="Credits" step="0.5"></div>
+                <button class="btn-mini" onclick="this.parentElement.remove()">×</button>
             `;
             container.appendChild(div);
-            renumberLabels();
         }
 
-        function removeRow(btn) {
-            btn.parentElement.remove();
-            renumberLabels();
-        }
-
-        function renumberLabels() {
-            const rows = document.querySelectorAll('.sem-row');
-            rows.forEach((row, index) => {
-                const labels = row.querySelectorAll('label');
-                labels[0].innerText = `Sem ${index + 1} SGPA`;
-                labels[1].innerText = `Sem ${index + 1} Credits`;
-            });
-        }
-
-        // --- Calculation Logic ---
-        function calculate() {
-            // 1. Gather Past Data
-            let totalPastPoints = 0;
-            let totalPastCredits = 0;
-            let currentCgpa = 0;
-
-            if (currentMode === 'detailed') {
-                const sgpaInputs = document.querySelectorAll('.sem-sgpa');
-                const creditInputs = document.querySelectorAll('.sem-credits');
-                
-                for(let i=0; i<sgpaInputs.length; i++) {
-                    const s = parseFloat(sgpaInputs[i].value);
-                    const c = parseFloat(creditInputs[i].value);
-                    if(!isNaN(s) && !isNaN(c)) {
-                        totalPastPoints += (s * c);
-                        totalPastCredits += c;
-                    }
-                }
-                if (totalPastCredits > 0) currentCgpa = totalPastPoints / totalPastCredits;
-            } else {
-                currentCgpa = parseFloat(document.getElementById('quick-cgpa').value) || 0;
-                totalPastCredits = parseFloat(document.getElementById('quick-credits').value) || 0;
-                totalPastPoints = currentCgpa * totalPastCredits;
-            }
-
-            if (totalPastCredits === 0) {
-                alert("Please enter valid past academic data.");
-                return;
-            }
-
-            // 2. Display Current Status
-            document.getElementById('disp-curr-cgpa').innerText = currentCgpa.toFixed(2);
-            document.getElementById('disp-past-credits').innerText = totalPastCredits;
-            document.getElementById('result-section').style.display = "block";
-
-            // 3. Gather Future Data & Target
-            const strategy = document.querySelector('input[name="strategy"]:checked').value;
-            const inputCredits = parseFloat(document.getElementById('futureCredits').value);
-            const targetCgpa = parseFloat(document.getElementById('targetCgpa').value);
-
-            if (isNaN(inputCredits)) {
-                alert("Please enter credits info.");
-                return;
-            }
-
-            let creditsToCalc = 0;
-            let totalFutureCredits = 0;
-
-            if (strategy === 'next') {
-                creditsToCalc = inputCredits;
-                totalFutureCredits = totalPastCredits + creditsToCalc;
-                document.getElementById('disp-mode').innerText = "Next Sem";
-                document.getElementById('th-perform').innerText = "If Next SGPA";
-            } else {
-                // User entered Total Degree Credits (e.g., 160)
-                // Remaining = 160 - Past
-                totalFutureCredits = inputCredits; 
-                creditsToCalc = totalFutureCredits - totalPastCredits;
-                document.getElementById('disp-mode').innerText = "Rest of Degree";
-                document.getElementById('th-perform').innerText = "Avg SGPA Needed";
-
-                if (creditsToCalc <= 0) {
-                    alert("Total credits must be greater than past credits!");
-                    return;
-                }
-            }
-
-            // 4. Calculate Requirement
-            const targetBox = document.getElementById('target-feedback');
+        function updStrat() {
+            const isNext = document.querySelector('input[name="strat"]:checked').value === 'next';
+            const lbl = document.getElementById('lbl-credits');
+            const inp = document.getElementById('f-credits');
             
-            if (!isNaN(targetCgpa)) {
-                const requiredTotalPoints = targetCgpa * totalFutureCredits;
-                const pointsNeeded = requiredTotalPoints - totalPastPoints;
-                const requiredSgpa = pointsNeeded / creditsToCalc;
-                const maxPossibleCgpa = (totalPastPoints + (10 * creditsToCalc)) / totalFutureCredits;
-
-                let html = "";
-                let subText = strategy === 'next' ? "SGPA in next sem" : "Avg SGPA per remaining sem";
-
-                if (requiredSgpa > 10.0) {
-                    html = `
-                        <div class="target-message" style="color:var(--danger)">Goal Unreachable</div>
-                        <div style="color:#cbd5e1">Requires <span style="color:var(--danger);font-weight:bold">${requiredSgpa.toFixed(2)}</span> ${subText}</div>
-                        <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px">Mathematically max possible is <b>${maxPossibleCgpa.toFixed(2)}</b></div>
-                    `;
-                } else if (requiredSgpa <= 0) {
-                    html = `<div class="target-message" style="color:var(--success)">Goal Secured</div><div style="color:#cbd5e1">You are mathematically above target.</div>`;
-                } else {
-                    html = `
-                        <div class="target-message">To reach <span style="color:white">${targetCgpa}</span></div>
-                        <div style="color:#cbd5e1">You need to average:</div>
-                        <div class="target-value">${requiredSgpa.toFixed(2)} SGPA</div>
-                        <div style="font-size:0.85rem; color:var(--text-muted);">${subText}</div>
-                    `;
-                }
-                targetBox.innerHTML = html;
+            // --- LINK LOGIC ---
+            if(isNext) {
+                // Link to TIMETABLE
+                lbl.innerHTML = `Next Sem Credits <a href="https://google.com/search?q=college+timetable" target="_blank" class="info-btn" title="Check Timetable">i</a>`;
+                inp.placeholder = "e.g. 24";
             } else {
-                targetBox.innerHTML = `<div style="color:var(--text-muted); font-style:italic">Enter a Target CGPA to see requirements.</div>`;
+                // Link to CURRICULUM
+                lbl.innerHTML = `Total Course Credits <a href="https://google.com/search?q=college+curriculum" target="_blank" class="info-btn" title="Check Curriculum">i</a>`;
+                inp.placeholder = "e.g. 160 (Total for 4 years)";
+            }
+        }
+
+        // --- Math Logic ---
+        function calc() {
+            // 1. Get Past Data
+            let pPoints = 0, pCreds = 0;
+            if (mode === 'detailed') {
+                document.querySelectorAll('.sem-row').forEach(row => {
+                    const s = parseFloat(row.querySelector('.r-sgpa').value);
+                    const c = parseFloat(row.querySelector('.r-cred').value);
+                    if(!isNaN(s) && !isNaN(c)) { pPoints += s*c; pCreds += c; }
+                });
+            } else {
+                const cg = parseFloat(document.getElementById('q-cgpa').value);
+                const cr = parseFloat(document.getElementById('q-credits').value);
+                if(!isNaN(cg) && !isNaN(cr)) { pPoints = cg*cr; pCreds = cr; }
             }
 
-            // 5. Projection Loop (Scenario Table)
-            const tbody = document.getElementById('projection-body');
-            tbody.innerHTML = "";
+            if(pCreds === 0) return alert("Please enter valid past grades.");
 
-            for (let sgpa = 10.0; sgpa >= 4.0; sgpa -= 0.5) {
-                // Here 'sgpa' represents either the Next Sem SGPA OR the Average Remaining SGPA
-                const projectedPoints = totalPastPoints + (sgpa * creditsToCalc);
-                const projectedCgpa = projectedPoints / totalFutureCredits;
-                
-                const diff = projectedCgpa - currentCgpa;
-                let diffStr = "-", diffClass = "neutral";
-                
-                if (diff > 0.001) { diffStr = "▲ " + diff.toFixed(3); diffClass = "gain"; }
-                else if (diff < -0.001) { diffStr = "▼ " + Math.abs(diff).toFixed(3); diffClass = "loss"; }
+            // 2. Get Future Data
+            const strat = document.querySelector('input[name="strat"]:checked').value;
+            const fInput = parseFloat(document.getElementById('f-credits').value);
+            const target = parseFloat(document.getElementById('target').value);
 
-                let rowStyle = "";
-                if (!isNaN(targetCgpa) && projectedCgpa >= targetCgpa - 0.001) {
-                    rowStyle = "background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--success);";
+            if(isNaN(fInput)) return alert("Please enter future credit info.");
+
+            let credsToEarn = 0, totalCreds = 0;
+            if(strat === 'next') {
+                credsToEarn = fInput;
+                totalCreds = pCreds + credsToEarn;
+            } else {
+                totalCreds = fInput;
+                credsToEarn = totalCreds - pCreds;
+                if(credsToEarn <= 0) return alert("Total credits must be more than past credits.");
+            }
+
+            const currCGPA = pPoints / pCreds;
+
+            // 3. Render Header
+            document.getElementById('out-curr').innerText = currCGPA.toFixed(2);
+            document.getElementById('out-cred').innerText = pCreds;
+            document.getElementById('out-goal').innerText = isNaN(target) ? "--" : target;
+            document.getElementById('result-area').style.display = "block";
+
+            // 4. Target Analysis
+            const box = document.getElementById('feedback');
+            if(!isNaN(target)) {
+                const reqPoints = (target * totalCreds) - pPoints;
+                const reqSGPA = reqPoints / credsToEarn;
+                const maxCGPA = (pPoints + (10 * credsToEarn)) / totalCreds;
+
+                if(reqSGPA > 10) {
+                    box.innerHTML = `<span style="color:var(--danger); font-weight:bold;">Impossible</span><br><span style="color:#94a3b8; font-size:0.9rem">Max possible is ${maxCGPA.toFixed(2)}</span>`;
+                    box.style.border = "1px solid var(--danger)";
+                } else if (reqSGPA <= 0) {
+                    box.innerHTML = `<span style="color:var(--success); font-weight:bold;">Goal Secured</span>`;
+                    box.style.border = "1px solid var(--success)";
+                } else {
+                    box.innerHTML = `Need <b>${reqSGPA.toFixed(2)}</b> SGPA <span style="color:#94a3b8; font-size:0.85rem">(${strat === 'next' ? 'Next Sem' : 'Avg for rest'})</span>`;
+                    box.style.border = "1px solid var(--accent)";
                 }
+            } else {
+                box.innerHTML = "Enter a goal to see requirements.";
+                box.style.border = "1px solid var(--card-border)";
+            }
+
+            // 5. Table
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = "";
+            for(let s = 10; s >= 4; s -= 0.5) {
+                const proj = (pPoints + (s * credsToEarn)) / totalCreds;
+                const diff = proj - currCGPA;
+                let col = "#94a3b8";
+                if(diff > 0.01) col = "var(--success)";
+                if(diff < -0.01) col = "var(--danger)";
+                
+                // Highlight Goal
+                let style = "";
+                if(!isNaN(target) && proj >= target - 0.001) style = "background:rgba(34, 197, 94, 0.1)";
 
                 tbody.innerHTML += `
-                    <tr style="${rowStyle}">
-                        <td style="font-weight:bold; color:white;">${sgpa.toFixed(1)}</td>
-                        <td style="font-size:1.1em; font-weight:bold;">${projectedCgpa.toFixed(2)}</td>
-                        <td class="${diffClass}">${diffStr}</td>
+                    <tr style="${style}">
+                        <td style="color:white; font-weight:bold;">${s.toFixed(1)}</td>
+                        <td>${proj.toFixed(2)}</td>
+                        <td style="color:${col}">${diff > 0 ? '+' : ''}${diff.toFixed(2)}</td>
                     </tr>
                 `;
             }
-            
-            document.getElementById('target-feedback').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            document.getElementById('result-area').scrollIntoView({behavior:'smooth'});
         }
     </script>
 </body>
