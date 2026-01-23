@@ -20,7 +20,7 @@ function Header({ onReset, onLoadExample }) {
             >
                 <h1>
                     <FiAward style={{ display: 'inline', marginRight: '12px' }} />
-                    Grade Projector
+                    Naveen Shankar
                 </h1>
                 <p className="subtitle">Plan your academic success with style!</p>
                 <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
