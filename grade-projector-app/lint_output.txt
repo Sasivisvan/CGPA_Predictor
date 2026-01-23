@@ -1,0 +1,68 @@
+
+> grade-projector-app@0.0.0 lint
+> eslint .
+
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\App.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\components\AnimatedButton.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\components\AnimatedStatCard.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\components\CGPAProgressRing.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\components\ConfirmModal.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\components\Header.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\components\HistoryCard.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\components\Results.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\components\ScenarioChart.jsx
+   3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               no-unused-vars
+  52:30  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  50 |             domain={['dataMin - 0.5', 'dataMax + 0.5']}
+  51 |           />
+> 52 |           <Tooltip content={<CustomTooltip />} />
+     |                              ^^^^^^^^^^^^^ This component is created during render
+  53 |           {targetCGPA && (
+  54 |             <ReferenceLine 
+  55 |               y={targetCGPA} 
+
+  11 |   })).reverse(); // Reverse to show from low to high
+  12 |
+> 13 |   const CustomTooltip = ({ active, payload }) => {
+     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 14 |     if (active && payload && payload.length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 15 |       const data = payload[0].payload;
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 26 |     return null;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 27 |   };
+     | ^^^^ The component is created during render here
+  28 |
+  29 |   return (
+  30 |     <motion.div  react-hooks/static-components
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\components\StrategyCard.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\kathin\OneDrive\Desktop\CGPA_Predictor\grade-projector-app\src\components\Tooltip.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+✖ 12 problems (12 errors, 0 warnings)
+

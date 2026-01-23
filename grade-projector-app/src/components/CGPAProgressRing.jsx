@@ -6,8 +6,9 @@ function CGPAProgressRing({ current, target, max, difficulty }) {
   const ref = React.useRef(null);
   const isInView = useInView(ref, { once: true });
 
-  const size = 200;
-  const strokeWidth = 12;
+  // Increased size slightly to fit content comfortably without clustering
+  const size = 160;
+  const strokeWidth = 10;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
@@ -49,7 +50,7 @@ function CGPAProgressRing({ current, target, max, difficulty }) {
           stroke="rgba(148, 163, 184, 0.1)"
           strokeWidth={strokeWidth}
         />
-        
+
         {/* Max possible circle (subtle) */}
         <motion.circle
           cx={size / 2}
@@ -76,8 +77,6 @@ function CGPAProgressRing({ current, target, max, difficulty }) {
             fill="none"
             stroke={getDifficultyColor()}
             strokeWidth={strokeWidth - 6}
-            strokeDasharray={circumference}
-            strokeDashoffset={targetOffset}
             strokeLinecap="round"
             strokeDasharray={`${circumference * (targetProgress / 100)} ${circumference}`}
             initial={{ strokeDashoffset: circumference }}

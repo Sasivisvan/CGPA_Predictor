@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiGraduationCap, FiRefreshCw, FiFileText } from 'react-icons/fi';
+import { FiAward, FiRefreshCw, FiFileText } from 'react-icons/fi';
 import ConfirmModal from './ConfirmModal';
 
 function Header({ onReset, onLoadExample }) {
@@ -12,21 +12,21 @@ function Header({ onReset, onLoadExample }) {
 
     return (
         <>
-            <motion.header 
+            <motion.header
                 className="header"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
             >
                 <h1>
-                    <FiGraduationCap style={{ display: 'inline', marginRight: '12px' }} />
+                    <FiAward style={{ display: 'inline', marginRight: '12px' }} />
                     Grade Projector
                 </h1>
                 <p className="subtitle">Plan your academic success with style!</p>
                 <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
                     {onLoadExample && (
-                        <motion.button 
-                            className="example-btn" 
+                        <motion.button
+                            className="example-btn"
                             onClick={onLoadExample}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
@@ -35,8 +35,8 @@ function Header({ onReset, onLoadExample }) {
                             Load Example
                         </motion.button>
                     )}
-                    <motion.button 
-                        className="reset-btn" 
+                    <motion.button
+                        className="reset-btn"
                         onClick={() => setShowModal(true)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -46,7 +46,7 @@ function Header({ onReset, onLoadExample }) {
                     </motion.button>
                 </div>
             </motion.header>
-            
+
             <ConfirmModal
                 open={showModal}
                 onOpenChange={setShowModal}

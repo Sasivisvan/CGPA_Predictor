@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiCopy } from 'react-icons/fi';
+import { FiCopy, FiAlertOctagon, FiBarChart2 } from 'react-icons/fi';
 import AnimatedStatCard from './AnimatedStatCard';
 import CGPAProgressRing from './CGPAProgressRing';
 import ScenarioChart from './ScenarioChart';
@@ -34,7 +34,7 @@ function Results({ results }) {
 
     // Copy results to clipboard
     const copyResults = () => {
-        let text = `📊 CGPA Projection Results\n\n`;
+        let text = `CGPA Projection Results\n\n`;
         text += `Current CGPA: ${currentCGPA.toFixed(2)}\n`;
         text += `Past Credits: ${pastCredits}\n`;
         if (targetCGPA) {
@@ -59,7 +59,7 @@ function Results({ results }) {
     };
 
     return (
-        <motion.div 
+        <motion.div
             className="results-section"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -93,17 +93,17 @@ function Results({ results }) {
 
             {/* Stats Header */}
             <div className="results-header">
-                <AnimatedStatCard 
-                    label="Current CGPA" 
-                    value={currentCGPA} 
+                <AnimatedStatCard
+                    label="Current CGPA"
+                    value={currentCGPA}
                 />
-                <AnimatedStatCard 
-                    label="Past Credits" 
-                    value={pastCredits} 
+                <AnimatedStatCard
+                    label="Past Credits"
+                    value={pastCredits}
                 />
-                <AnimatedStatCard 
-                    label="Goal" 
-                    value={targetCGPA || '--'} 
+                <AnimatedStatCard
+                    label="Goal"
+                    value={targetCGPA || '--'}
                     isAccent={!!targetCGPA}
                 />
             </div>
@@ -133,8 +133,8 @@ function Results({ results }) {
                         </>
                     ) : (
                         <>
-                            <div className="required-label" style={{ color: 'var(--danger)', fontWeight: 700, fontSize: '1.1rem' }}>
-                                🚫 Goal Unreachable
+                            <div className="required-label" style={{ color: 'var(--danger)', fontWeight: 700, fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                <FiAlertOctagon /> Goal Unreachable
                             </div>
                             <div style={{ color: 'var(--text-muted)', marginTop: '8px' }}>
                                 Maximum possible CGPA is <strong>{maxPossibleCGPA.toFixed(2)}</strong>
@@ -145,21 +145,19 @@ function Results({ results }) {
                 </div>
             )}
 
-            {/* Scenario Chart */}
-            <ScenarioChart
-                scenarios={scenarios}
-                targetCGPA={targetCGPA}
-                currentCGPA={currentCGPA}
-            />
+
 
             {/* Scenarios Table */}
-            <motion.div 
+            <motion.div
                 className="results-table-container"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
             >
-                <div className="table-title">📊 Detailed Performance Scenarios</div>
+                <div className="table-title">
+                    <FiBarChart2 style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                    Detailed Performance Scenarios
+                </div>
                 <table className="results-table">
                     <thead>
                         <tr>
@@ -175,8 +173,8 @@ function Results({ results }) {
                             const isHighlighted = targetCGPA && scenario.newCGPA >= targetCGPA - 0.001;
 
                             return (
-                                <motion.tr 
-                                    key={index} 
+                                <motion.tr
+                                    key={index}
                                     className={isHighlighted ? 'highlighted' : ''}
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}

@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import { FiActivity, FiTrash2, FiCheck, FiInfo } from 'react-icons/fi';
 import useLocalStorage from './hooks/useLocalStorage';
 import Header from './components/Header';
 import HistoryCard from './components/HistoryCard';
 import StrategyCard from './components/StrategyCard';
 import Results from './components/Results';
 import AnimatedButton from './components/AnimatedButton';
+import FloatingLines from './components/FloatingLines';
 import './App.css';
 
 function App() {
@@ -34,7 +36,7 @@ function App() {
     setStrategy('next');
     setFutureCredits('24');
     setTargetCGPA('9.0');
-    toast.success('Example data loaded! Click Calculate to see results.', { duration: 3000 });
+    toast.success('Example data loaded!', { icon: <FiCheck /> });
   };
 
   // Reset all data
@@ -47,7 +49,7 @@ function App() {
     setTargetCGPA('');
     setResults(null);
     localStorage.clear();
-    toast.success('All data cleared!');
+    toast.success('All data cleared!', { icon: <FiTrash2 /> });
   };
 
   // Keyboard shortcuts
@@ -63,7 +65,7 @@ function App() {
       // Escape to clear results
       if (e.key === 'Escape' && results) {
         setResults(null);
-        toast('Results cleared', { icon: '🗑️' });
+        toast('Results cleared', { icon: <FiTrash2 /> });
       }
     };
 
@@ -75,7 +77,7 @@ function App() {
   // Calculate projections
   const calculateProjections = () => {
     setIsCalculating(true);
-    
+
     // Simulate a small delay for better UX
     setTimeout(() => {
       // 1. Get Past Data
@@ -101,7 +103,7 @@ function App() {
       }
 
       if (pastCredits === 0) {
-        toast.error('Please enter valid past grades.');
+        toast.error('Please enter valid past grades.', { icon: <FiInfo /> });
         setIsCalculating(false);
         return;
       }
@@ -111,7 +113,7 @@ function App() {
       const target = parseFloat(targetCGPA);
 
       if (isNaN(futureCreditsVal)) {
-        toast.error('Please enter future credit information.');
+        toast.error('Please enter future credit information.', { icon: <FiInfo /> });
         setIsCalculating(false);
         return;
       }
@@ -126,50 +128,50 @@ function App() {
         totalCredits = futureCreditsVal;
         creditsToEarn = totalCredits - pastCredits;
         if (creditsToEarn <= 0) {
-          toast.error('Total credits must be more than past credits.');
+          toast.error('Total credits must be more than past credits.', { icon: <FiInfo /> });
           setIsCalculating(false);
           return;
         }
       }
 
-    const currentCGPA = pastPoints / pastCredits;
-    const maxPossibleCGPA = (pastPoints + (10 * creditsToEarn)) / totalCredits;
+      const currentCGPA = pastPoints / pastCredits;
+      const maxPossibleCGPA = (pastPoints + (10 * creditsToEarn)) / totalCredits;
 
-    // 3. Calculate required SGPA and difficulty
-    let requiredSGPA = null;
-    let difficulty = '';
-    let isGoalReachable = true;
+      // 3. Calculate required SGPA and difficulty
+      let requiredSGPA = null;
+      let difficulty = '';
+      let isGoalReachable = true;
 
-    if (!isNaN(target)) {
-      const requiredPoints = (target * totalCredits) - pastPoints;
-      requiredSGPA = requiredPoints / creditsToEarn;
-      const gap = requiredSGPA - currentCGPA;
+      if (!isNaN(target)) {
+        const requiredPoints = (target * totalCredits) - pastPoints;
+        requiredSGPA = requiredPoints / creditsToEarn;
+        const gap = requiredSGPA - currentCGPA;
 
-      if (requiredSGPA > 10) {
-        difficulty = 'IMPOSSIBLE';
-        isGoalReachable = false;
-      } else if (requiredSGPA <= currentCGPA) {
-        difficulty = 'COMFORTABLE';
-      } else if (gap < 0.5) {
-        difficulty = 'EASY REACH';
-      } else if (gap < 1.0) {
-        difficulty = 'MODERATE';
-      } else {
-        difficulty = 'HARD GRIND';
+        if (requiredSGPA > 10) {
+          difficulty = 'IMPOSSIBLE';
+          isGoalReachable = false;
+        } else if (requiredSGPA <= currentCGPA) {
+          difficulty = 'COMFORTABLE';
+        } else if (gap < 0.5) {
+          difficulty = 'EASY REACH';
+        } else if (gap < 1.0) {
+          difficulty = 'MODERATE';
+        } else {
+          difficulty = 'HARD GRIND';
+        }
       }
-    }
 
-    // 4. Generate scenarios
-    const scenarios = [];
-    for (let sgpa = 10; sgpa >= 4; sgpa -= 0.5) {
-      const projectedCGPA = (pastPoints + (sgpa * creditsToEarn)) / totalCredits;
-      const change = projectedCGPA - currentCGPA;
-      scenarios.push({
-        sgpa,
-        newCGPA: projectedCGPA,
-        change
-      });
-    }
+      // 4. Generate scenarios
+      const scenarios = [];
+      for (let sgpa = 10; sgpa >= 4; sgpa -= 0.5) {
+        const projectedCGPA = (pastPoints + (sgpa * creditsToEarn)) / totalCredits;
+        const change = projectedCGPA - currentCGPA;
+        scenarios.push({
+          sgpa,
+          newCGPA: projectedCGPA,
+          change
+        });
+      }
 
       // 5. Set results
       setResults({
@@ -184,18 +186,20 @@ function App() {
       });
 
       setIsCalculating(false);
-      
+
       // Success toast with context
       if (targetCGPA && isGoalReachable) {
         toast.success(`Goal is ${difficulty}! Required SGPA: ${requiredSGPA.toFixed(2)}`, {
           duration: 4000,
+          icon: <FiCheck />
         });
       } else if (targetCGPA && !isGoalReachable) {
         toast.error(`Goal unreachable. Max possible: ${maxPossibleCGPA.toFixed(2)}`, {
           duration: 4000,
+          icon: <FiInfo />
         });
       } else {
-        toast.success('Calculation complete! 🎉', { icon: '✨' });
+        toast.success('Calculation complete!', { icon: <FiCheck /> });
       }
 
       // Scroll to results
@@ -207,8 +211,29 @@ function App() {
 
   return (
     <>
-      {/* Decorative gradient background */}
-      <div className="balloon-decoration" aria-hidden="true" />
+      <Toaster
+        toastOptions={{
+          style: {
+            background: '#1e1e2e',
+            color: '#fff',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }
+        }}
+      />
+
+      {/* Background Effect */}
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
+        <FloatingLines
+          enabledWaves={["top", "middle", "bottom"]}
+          lineCount={10}
+          lineDistance={89.5}
+          bendRadius={25}
+          bendStrength={-1}
+          interactive={true}
+          parallax={true}
+          linesGradient={['#6366f1', '#8b5cf6', '#06b6d4']} /* Custom gradient matching theme */
+        />
+      </div>
 
       <motion.div
         className="container"
@@ -245,7 +270,7 @@ function App() {
               onClick={calculateProjections}
               isLoading={isCalculating}
             >
-              ✨ Calculate Projection
+              <FiActivity style={{ marginRight: '8px' }} /> Calculate Projection
             </AnimatedButton>
           </section>
 
