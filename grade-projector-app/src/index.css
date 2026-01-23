@@ -118,6 +118,33 @@ body {
   z-index: 1;
 }
 
+
+
+/* ===== Background Switching ===== */
+.mobile-bg {
+  display: none;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  /* Ensure dark background for Aurora */
+}
+
+.desktop-bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 768px) {
+  .mobile-bg {
+    display: block;
+  }
+
+  .desktop-bg {
+    display: none;
+  }
+}
+
 /* ===== App Layout ===== */
 .layout-grid {
   display: flex;
@@ -140,25 +167,31 @@ body {
   margin-top: var(--spacing-lg);
   padding: var(--spacing-xl);
   border-radius: var(--radius-xl);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.4);
+  /* Standardized dark glass */
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
   text-align: left;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
 .results-empty-title {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: var(--spacing-sm);
-  color: var(--text-secondary);
+  color: #ffffff;
+  /* Pure white */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .results-empty-text {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  line-height: 1.5;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  /* Brighter than muted */
+  line-height: 1.6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* ===== Header ===== */
@@ -241,7 +274,8 @@ body {
 
 /* ===== Component Containers (No Card Look) ===== */
 .card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.4);
+  /* Standardized dark glass */
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -528,7 +562,8 @@ body {
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.4);
+  /* Standardized dark glass */
   backdrop-filter: blur(40px);
   padding: var(--spacing-xl);
   border-radius: var(--radius-lg);
@@ -579,7 +614,8 @@ body {
   border-radius: var(--radius-xl);
   text-align: center;
   margin-bottom: var(--spacing-xl);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.4);
+  /* Standardized dark glass */
   backdrop-filter: blur(40px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: none;
@@ -605,6 +641,38 @@ body {
 @media (max-width: 640px) {
   .header h1 {
     font-size: 2.5rem;
+  }
+
+  .semester-row {
+    flex-direction: column;
+    /* Stack vertically */
+    align-items: stretch;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  /* Override inline flex:1 from React component to fix mobile width */
+  .semester-row>div {
+    flex: none !important;
+    width: 100%;
+  }
+
+  /* Full width remove button for easier tapping */
+  .semester-row .btn-remove {
+    width: auto;
+    min-width: 44px;
+    height: 44px;
+    margin-left: auto;
+    /* Float to right */
+    margin-top: 4px;
+    border-radius: var(--radius-md);
+    padding: 0 var(--spacing-lg);
+    /* Add horizontal padding for touch target */
+  }
+
+  .card {
+    padding: var(--spacing-lg);
+    /* Reduce padding on mobile */
   }
 }
 
@@ -679,7 +747,8 @@ body {
 
 /* ===== Results Table Overhaul ===== */
 .results-table-container {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.4);
+  /* Standardized dark glass */
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   border-radius: var(--radius-xl);
@@ -744,9 +813,9 @@ body {
   border-radius: var(--radius-xl);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   position: fixed;
-  inset: 0;
-  /* Full screen reference */
-  margin: auto;
+  top: 50%;
+  left: 50%;
+  /* Centering handled by Framer Motion x/y to prevent transform conflicts */
   /* Centers the fixed element */
   width: 90vw;
   max-width: 450px;

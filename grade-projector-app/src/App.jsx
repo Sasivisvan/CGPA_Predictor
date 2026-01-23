@@ -9,6 +9,7 @@ import StrategyCard from './components/StrategyCard';
 import Results from './components/Results';
 import AnimatedButton from './components/AnimatedButton';
 import FloatingLines from './components/FloatingLines';
+import Galaxy from './components/Galaxy';
 import './App.css';
 
 function App() {
@@ -223,16 +224,34 @@ function App() {
 
       {/* Background Effect */}
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
-        <FloatingLines
-          enabledWaves={["top", "middle", "bottom"]}
-          lineCount={10}
-          lineDistance={89.5}
-          bendRadius={25}
-          bendStrength={-1}
-          interactive={true}
-          parallax={true}
-          linesGradient={['#6366f1', '#8b5cf6', '#06b6d4']} /* Custom gradient matching theme */
-        />
+        <div className="desktop-bg">
+          <FloatingLines
+            enabledWaves={["top", "middle", "bottom"]}
+            lineCount={10}
+            lineDistance={89.5}
+            bendRadius={25}
+            bendStrength={-1}
+            interactive={true}
+            parallax={true}
+            linesGradient={['#6366f1', '#8b5cf6', '#06b6d4']}
+          />
+        </div>
+        <div className="mobile-bg">
+          <Galaxy
+            mouseRepulsion={true}
+            mouseInteraction={true}
+            density={1}
+            glowIntensity={0.3}
+            saturation={0}
+            hueShift={140}
+            twinkleIntensity={0.3}
+            rotationSpeed={0.1}
+            repulsionStrength={2}
+            autoCenterRepulsion={0}
+            starSpeed={0.5}
+            speed={1}
+          />
+        </div>
       </div>
 
       <motion.div
