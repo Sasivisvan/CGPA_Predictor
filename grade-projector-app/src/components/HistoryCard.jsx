@@ -1,4 +1,7 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiBook, FiPlus, FiX, FiHelpCircle } from 'react-icons/fi';
+import Tooltip from './Tooltip';
 
 function HistoryCard({
     mode,
@@ -25,9 +28,17 @@ function HistoryCard({
     };
 
     return (
-        <div className="card">
+        <motion.div 
+            className="card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+        >
             <span className="step-badge">Step 1</span>
-            <h2 className="card-title">📚 Your Academic History</h2>
+            <h2 className="card-title">
+                <FiBook style={{ marginRight: '8px' }} />
+                Your Academic History
+            </h2>
 
             {/* Mode Tabs */}
             <div className="tabs">
@@ -46,71 +57,142 @@ function HistoryCard({
             </div>
 
             {/* Detailed Mode */}
-            {mode === 'detailed' && (
-                <div className="detailed-mode">
-                    {semesters.map((sem, index) => (
-                        <div key={index} className="semester-row">
+            <AnimatePresence mode="wait">
+                {mode === 'detailed' && (
+                    <motion.div 
+                        className="detailed-mode"
+                        key="detailed"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <AnimatePresence>
+                            {semesters.map((sem, index) => (
+                                <motion.div 
+                                    key={index} 
+                                    className="semester-row"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20, height: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <div style={{ position: 'relative', flex: 1 }}>
+                                        <input
+                                            type="number"
+                                            placeholder={`SGPA Sem ${index + 1}`}
+                                            step="0.01"
+                                            min="0"
+                                            max="10"
+                                            value={sem.sgpa}
+                                            onChange={(e) => updateSemester(index, 'sgpa', e.target.value)}
+                                        />
+                                        <Tooltip content="Semester Grade Point Average (0-10 scale)">
+                                            <FiHelpCircle style={{ 
+                                                position: 'absolute', 
+                                                right: '12px', 
+                                                top: '50%', 
+                                                transform: 'translateY(-50%)',
+                                                color: 'var(--text-muted)',
+                                                fontSize: '14px',
+                                                cursor: 'help'
+                                            }} />
+                                        </Tooltip>
+                                    </div>
+                                    <div style={{ position: 'relative', flex: 1 }}>
+                                        <input
+                                            type="number"
+                                            placeholder="Credits"
+                                            step="0.5"
+                                            min="0"
+                                            value={sem.credits}
+                                            onChange={(e) => updateSemester(index, 'credits', e.target.value)}
+                                        />
+                                        <Tooltip content="Total credit hours for this semester">
+                                            <FiHelpCircle style={{ 
+                                                position: 'absolute', 
+                                                right: '12px', 
+                                                top: '50%', 
+                                                transform: 'translateY(-50%)',
+                                                color: 'var(--text-muted)',
+                                                fontSize: '14px',
+                                                cursor: 'help'
+                                            }} />
+                                        </Tooltip>
+                                    </div>
+                                    <motion.button
+                                        className="btn-remove"
+                                        onClick={() => removeSemester(index)}
+                                        aria-label="Remove semester"
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                    >
+                                        <FiX />
+                                    </motion.button>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                        <motion.button 
+                            className="btn-add" 
+                            onClick={addSemester}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            <FiPlus style={{ marginRight: '6px' }} />
+                            Add Semester
+                        </motion.button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Quick Mode */}
+            <AnimatePresence mode="wait">
+                {mode === 'quick' && (
+                    <motion.div 
+                        className="quick-mode"
+                        key="quick"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="input-group">
+                            <label>
+                                Current CGPA
+                                <Tooltip content="Your cumulative grade point average (0-10 scale)">
+                                    <FiHelpCircle style={{ marginLeft: '6px', fontSize: '14px', color: 'var(--text-muted)', cursor: 'help' }} />
+                                </Tooltip>
+                            </label>
                             <input
                                 type="number"
-                                placeholder={`SGPA Sem ${index + 1}`}
+                                placeholder="e.g. 8.4"
                                 step="0.01"
                                 min="0"
                                 max="10"
-                                value={sem.sgpa}
-                                onChange={(e) => updateSemester(index, 'sgpa', e.target.value)}
+                                value={quickData.cgpa}
+                                onChange={(e) => setQuickData({ ...quickData, cgpa: e.target.value })}
                             />
+                        </div>
+                        <div className="input-group">
+                            <label>
+                                Total Past Credits
+                                <Tooltip content="Total credit hours you've completed so far">
+                                    <FiHelpCircle style={{ marginLeft: '6px', fontSize: '14px', color: 'var(--text-muted)', cursor: 'help' }} />
+                                </Tooltip>
+                            </label>
                             <input
                                 type="number"
-                                placeholder="Credits"
+                                placeholder="e.g. 82"
                                 step="0.5"
                                 min="0"
-                                value={sem.credits}
-                                onChange={(e) => updateSemester(index, 'credits', e.target.value)}
+                                value={quickData.credits}
+                                onChange={(e) => setQuickData({ ...quickData, credits: e.target.value })}
                             />
-                            <button
-                                className="btn-remove"
-                                onClick={() => removeSemester(index)}
-                                aria-label="Remove semester"
-                            >
-                                ×
-                            </button>
                         </div>
-                    ))}
-                    <button className="btn-add" onClick={addSemester}>
-                        + Add Semester
-                    </button>
-                </div>
-            )}
-
-            {/* Quick Mode */}
-            {mode === 'quick' && (
-                <div className="quick-mode">
-                    <div className="input-group">
-                        <label>Current CGPA</label>
-                        <input
-                            type="number"
-                            placeholder="e.g. 8.4"
-                            step="0.01"
-                            min="0"
-                            max="10"
-                            value={quickData.cgpa}
-                            onChange={(e) => setQuickData({ ...quickData, cgpa: e.target.value })}
-                        />
-                    </div>
-                    <div className="input-group">
-                        <label>Total Past Credits</label>
-                        <input
-                            type="number"
-                            placeholder="e.g. 82"
-                            step="0.5"
-                            min="0"
-                            value={quickData.credits}
-                            onChange={(e) => setQuickData({ ...quickData, credits: e.target.value })}
-                        />
-                    </div>
-                </div>
-            )}
-        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 }
 

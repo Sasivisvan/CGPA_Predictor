@@ -1,19 +1,32 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import { FiTarget, FiCalendar, FiTrendingUp, FiAward, FiHelpCircle } from 'react-icons/fi';
+import Tooltip from './Tooltip';
 
 function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, targetCGPA, setTargetCGPA }) {
 
     const isNextSem = strategy === 'next';
 
     return (
-        <div className="card">
+        <motion.div 
+            className="card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+        >
             <span className="step-badge">Step 2</span>
-            <h2 className="card-title">🎯 Your Strategy</h2>
+            <h2 className="card-title">
+                <FiTarget style={{ marginRight: '8px' }} />
+                Your Strategy
+            </h2>
 
             {/* Strategy Selection */}
             <div className="strategy-grid">
-                <div
+                <motion.div
                     className={`radio-card ${strategy === 'next' ? 'active' : ''}`}
                     onClick={() => setStrategy('next')}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                 >
                     <input
                         type="radio"
@@ -22,11 +35,14 @@ function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, 
                         checked={strategy === 'next'}
                         onChange={() => setStrategy('next')}
                     />
+                    <FiCalendar style={{ marginRight: '6px' }} />
                     Next Sem Only
-                </div>
-                <div
+                </motion.div>
+                <motion.div
                     className={`radio-card ${strategy === 'degree' ? 'active' : ''}`}
                     onClick={() => setStrategy('degree')}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                 >
                     <input
                         type="radio"
@@ -35,14 +51,28 @@ function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, 
                         checked={strategy === 'degree'}
                         onChange={() => setStrategy('degree')}
                     />
+                    <FiTrendingUp style={{ marginRight: '6px' }} />
                     Rest of Degree
-                </div>
+                </motion.div>
             </div>
 
             {/* Future Credits Input */}
             <div className="input-group">
                 <label>
-                    {isNextSem ? '📅 Next Semester Credits' : '📊 Total Course Credits'}
+                    {isNextSem ? (
+                        <>
+                            <FiCalendar style={{ marginRight: '4px' }} />
+                            Next Semester Credits
+                        </>
+                    ) : (
+                        <>
+                            <FiTrendingUp style={{ marginRight: '4px' }} />
+                            Total Course Credits
+                        </>
+                    )}
+                    <Tooltip content={isNextSem ? "Credit hours for your next semester" : "Total credit hours for your entire degree"}>
+                        <FiHelpCircle style={{ marginLeft: '6px', fontSize: '14px', color: 'var(--text-muted)', cursor: 'help' }} />
+                    </Tooltip>
                 </label>
                 <input
                     type="number"
@@ -56,7 +86,13 @@ function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, 
 
             {/* Target CGPA Input */}
             <div className="input-group">
-                <label>🌟 Target CGPA Goal</label>
+                <label>
+                    <FiAward style={{ marginRight: '4px' }} />
+                    Target CGPA Goal
+                    <Tooltip content="Your desired final CGPA (optional - leave empty to see all scenarios)">
+                        <FiHelpCircle style={{ marginLeft: '6px', fontSize: '14px', color: 'var(--text-muted)', cursor: 'help' }} />
+                    </Tooltip>
+                </label>
                 <input
                     type="number"
                     placeholder="e.g. 9.0"
@@ -68,7 +104,7 @@ function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, 
                     style={{ borderColor: 'var(--accent-primary)' }}
                 />
             </div>
-        </div>
+        </motion.div>
     );
 }
 
