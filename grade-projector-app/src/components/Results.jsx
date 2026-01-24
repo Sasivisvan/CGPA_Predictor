@@ -161,9 +161,9 @@ function Results({ results }) {
                 <table className="results-table">
                     <thead>
                         <tr>
-                            <th>Performance (SGPA)</th>
+                            <th>SGPA</th>
                             <th>New CGPA</th>
-                            <th>Change</th>
+                            <th className="change-col">Change</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -182,7 +182,7 @@ function Results({ results }) {
                                 >
                                     <td className="performance">{scenario.sgpa.toFixed(1)}</td>
                                     <td>{scenario.newCGPA.toFixed(2)}</td>
-                                    <td className={changeClass}>
+                                    <td className={`change-col ${changeClass}`}>
                                         {scenario.change > 0 ? '+' : ''}{scenario.change.toFixed(2)}
                                     </td>
                                 </motion.tr>
