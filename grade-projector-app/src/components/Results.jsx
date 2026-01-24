@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiCopy, FiAlertOctagon, FiBarChart2 } from 'react-icons/fi';
+import { FiCopy, FiAlertOctagon, FiBarChart2, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import AnimatedStatCard from './AnimatedStatCard';
 import CGPAProgressRing from './CGPAProgressRing';
 import ScenarioChart from './ScenarioChart';
@@ -19,6 +19,9 @@ function Results({ results }) {
         difficulty,
         scenarios
     } = results;
+
+    const [isExpanded, setIsExpanded] = useState(false);
+    const visibleScenarios = isExpanded ? scenarios : scenarios.slice(0, 10);
 
     // Get difficulty badge class
     const getDifficultyClass = () => {
@@ -167,7 +170,7 @@ function Results({ results }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {scenarios.map((scenario, index) => {
+                        {visibleScenarios.map((scenario, index) => {
                             const changeClass = scenario.change > 0.01 ? 'positive' :
                                 scenario.change < -0.01 ? 'negative' : 'neutral';
                             const isHighlighted = targetCGPA && scenario.newCGPA >= targetCGPA - 0.001;
@@ -190,6 +193,20 @@ function Results({ results }) {
                         })}
                     </tbody>
                 </table>
+                {scenarios.length > 10 && (
+                    <motion.button
+                        className="btn-view-more"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        {isExpanded ? (
+                            <><FiChevronUp style={{ marginRight: '6px' }} /> Show Less</>
+                        ) : (
+                            <><FiChevronDown style={{ marginRight: '6px' }} /> View All {scenarios.length} Scenarios</>
+                        )}
+                    </motion.button>
+                )}
             </motion.div>
         </motion.div>
     );
