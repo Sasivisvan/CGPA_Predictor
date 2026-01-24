@@ -1,14 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FiTarget, FiCalendar, FiTrendingUp, FiAward, FiHelpCircle } from 'react-icons/fi';
-import Tooltip from './Tooltip';
+import { FiTarget, FiCalendar, FiTrendingUp, FiAward } from 'react-icons/fi';
 
 function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, targetCGPA, setTargetCGPA }) {
 
     const isNextSem = strategy === 'next';
 
     return (
-        <motion.div 
+        <motion.div
             className="card"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -70,9 +69,6 @@ function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, 
                             Total Course Credits
                         </>
                     )}
-                    <Tooltip content={isNextSem ? "Credit hours for your next semester" : "Total credit hours for your entire degree"}>
-                        <FiHelpCircle style={{ marginLeft: '6px', fontSize: '14px', color: 'var(--text-muted)', cursor: 'help' }} />
-                    </Tooltip>
                 </label>
                 <input
                     type="number"
@@ -89,9 +85,6 @@ function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, 
                 <label>
                     <FiAward style={{ marginRight: '4px' }} />
                     Target CGPA Goal
-                    <Tooltip content="Your desired final CGPA (optional - leave empty to see all scenarios)">
-                        <FiHelpCircle style={{ marginLeft: '6px', fontSize: '14px', color: 'var(--text-muted)', cursor: 'help' }} />
-                    </Tooltip>
                 </label>
                 <input
                     type="number"

@@ -28,6 +28,7 @@ function App() {
 
   // Load example data
   const loadExampleData = () => {
+    toast.dismiss();
     setMode('detailed');
     setSemesters([
       { sgpa: '8.5', credits: '24' },
@@ -37,11 +38,12 @@ function App() {
     setStrategy('next');
     setFutureCredits('24');
     setTargetCGPA('9.0');
-    toast.success('Example data loaded!', { icon: <FiCheck /> });
+    toast.success('Example data loaded!', { icon: <FiCheck />, id: 'load-example' });
   };
 
   // Reset all data
   const handleReset = () => {
+    toast.dismiss();
     setMode('detailed');
     setSemesters([{ sgpa: '', credits: '' }]);
     setQuickData({ cgpa: '', credits: '' });
@@ -50,7 +52,7 @@ function App() {
     setTargetCGPA('');
     setResults(null);
     localStorage.clear();
-    toast.success('All data cleared!', { icon: <FiTrash2 /> });
+    toast.success('All data cleared!', { icon: <FiTrash2 />, id: 'reset-data' });
   };
 
   // Keyboard shortcuts
@@ -66,7 +68,7 @@ function App() {
       // Escape to clear results
       if (e.key === 'Escape' && results) {
         setResults(null);
-        toast('Results cleared', { icon: <FiTrash2 /> });
+        toast('Results cleared', { icon: <FiTrash2 />, id: 'clear-results' });
       }
     };
 
@@ -104,7 +106,7 @@ function App() {
       }
 
       if (pastCredits === 0) {
-        toast.error('Please enter valid past grades.', { icon: <FiInfo /> });
+        toast.error('Please enter valid past grades.', { icon: <FiInfo />, id: 'err-past-grades' });
         setIsCalculating(false);
         return;
       }
@@ -114,7 +116,7 @@ function App() {
       const target = parseFloat(targetCGPA);
 
       if (isNaN(futureCreditsVal)) {
-        toast.error('Please enter future credit information.', { icon: <FiInfo /> });
+        toast.error('Please enter future credit information.', { icon: <FiInfo />, id: 'err-future-credits' });
         setIsCalculating(false);
         return;
       }
@@ -129,7 +131,7 @@ function App() {
         totalCredits = futureCreditsVal;
         creditsToEarn = totalCredits - pastCredits;
         if (creditsToEarn <= 0) {
-          toast.error('Total credits must be more than past credits.', { icon: <FiInfo /> });
+          toast.error('Total credits must be more than past credits.', { icon: <FiInfo />, id: 'err-total-credits' });
           setIsCalculating(false);
           return;
         }
@@ -192,15 +194,17 @@ function App() {
       if (targetCGPA && isGoalReachable) {
         toast.success(`Goal is ${difficulty}! Required SGPA: ${requiredSGPA.toFixed(2)}`, {
           duration: 4000,
-          icon: <FiCheck />
+          icon: <FiCheck />,
+          id: 'calc-success'
         });
       } else if (targetCGPA && !isGoalReachable) {
         toast.error(`Goal unreachable. Max possible: ${maxPossibleCGPA.toFixed(2)}`, {
           duration: 4000,
-          icon: <FiInfo />
+          icon: <FiInfo />,
+          id: 'calc-unreachable'
         });
       } else {
-        toast.success('Calculation complete!', { icon: <FiCheck /> });
+        toast.success('Calculation complete!', { icon: <FiCheck />, id: 'calc-complete' });
       }
 
       // Scroll to results
@@ -220,6 +224,7 @@ function App() {
             border: '1px solid rgba(255,255,255,0.1)'
           }
         }}
+        limit={1}
       />
 
       {/* Background Effect */}

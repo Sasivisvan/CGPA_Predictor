@@ -91,6 +91,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Hide native number input spinners globally */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
@@ -644,35 +657,52 @@ body {
   }
 
   .semester-row {
-    flex-direction: column;
-    /* Stack vertically */
-    align-items: stretch;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 40px;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
   }
 
-  /* Override inline flex:1 from React component to fix mobile width */
+  /* Remove width override - let grid handle it */
   .semester-row>div {
+    width: auto !important;
     flex: none !important;
+  }
+
+  /* Inputs fill the grid cell */
+  .semester-row input {
     width: 100%;
   }
 
-  /* Full width remove button for easier tapping */
+  /* Hide help icons on mobile for more space */
+  .semester-row [data-radix-tooltip-trigger] {
+    display: none !important;
+  }
+
+  /* Compact remove button */
   .semester-row .btn-remove {
-    width: auto;
-    min-width: 44px;
-    height: 44px;
-    margin-left: auto;
-    /* Float to right */
-    margin-top: 4px;
-    border-radius: var(--radius-md);
-    padding: 0 var(--spacing-lg);
-    /* Add horizontal padding for touch target */
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    margin: 0;
+    padding: 0;
+    font-size: 1.25rem;
+    grid-column: 3;
   }
 
   .card {
     padding: var(--spacing-lg);
-    /* Reduce padding on mobile */
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+  }
+
+  /* Results header stacks on mobile */
+  .results-header {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
   }
 }
 
@@ -917,4 +947,23 @@ body {
 
 .results-table td.neutral {
   color: var(--text-muted);
+}
+
+/* ===== Mobile Layout Fixes ===== */
+@media (max-width: 640px) {
+  .results-header {
+    grid-template-columns: 1fr;
+    /* Stack cards vertically on mobile */
+    gap: var(--spacing-md);
+  }
+
+  .stat-card {
+    padding: var(--spacing-lg);
+    /* Slightly reduced padding */
+  }
+
+  .stat-card .value {
+    font-size: 1.75rem;
+    /* Slightly smaller font for values */
+  }
 }

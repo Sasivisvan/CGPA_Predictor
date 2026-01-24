@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiBook, FiPlus, FiX, FiHelpCircle } from 'react-icons/fi';
-import Tooltip from './Tooltip';
+import { FiBook, FiPlus, FiX } from 'react-icons/fi';
 
 function HistoryCard({
     mode,
@@ -28,7 +27,7 @@ function HistoryCard({
     };
 
     return (
-        <motion.div 
+        <motion.div
             className="card"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -59,7 +58,7 @@ function HistoryCard({
             {/* Detailed Mode */}
             <AnimatePresence mode="wait">
                 {mode === 'detailed' && (
-                    <motion.div 
+                    <motion.div
                         className="detailed-mode"
                         key="detailed"
                         initial={{ opacity: 0, height: 0 }}
@@ -69,37 +68,26 @@ function HistoryCard({
                     >
                         <AnimatePresence>
                             {semesters.map((sem, index) => (
-                                <motion.div 
-                                    key={index} 
+                                <motion.div
+                                    key={index}
                                     className="semester-row"
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20, height: 0 }}
                                     transition={{ duration: 0.3 }}
                                 >
-                                    <div style={{ position: 'relative', flex: 1 }}>
+                                    <div>
                                         <input
                                             type="number"
-                                            placeholder={`SGPA Sem ${index + 1}`}
+                                            placeholder={`SGPA ${index + 1}`}
                                             step="0.01"
                                             min="0"
                                             max="10"
                                             value={sem.sgpa}
                                             onChange={(e) => updateSemester(index, 'sgpa', e.target.value)}
                                         />
-                                        <Tooltip content="Semester Grade Point Average (0-10 scale)">
-                                            <FiHelpCircle style={{ 
-                                                position: 'absolute', 
-                                                right: '12px', 
-                                                top: '50%', 
-                                                transform: 'translateY(-50%)',
-                                                color: 'var(--text-muted)',
-                                                fontSize: '14px',
-                                                cursor: 'help'
-                                            }} />
-                                        </Tooltip>
                                     </div>
-                                    <div style={{ position: 'relative', flex: 1 }}>
+                                    <div>
                                         <input
                                             type="number"
                                             placeholder="Credits"
@@ -108,17 +96,6 @@ function HistoryCard({
                                             value={sem.credits}
                                             onChange={(e) => updateSemester(index, 'credits', e.target.value)}
                                         />
-                                        <Tooltip content="Total credit hours for this semester">
-                                            <FiHelpCircle style={{ 
-                                                position: 'absolute', 
-                                                right: '12px', 
-                                                top: '50%', 
-                                                transform: 'translateY(-50%)',
-                                                color: 'var(--text-muted)',
-                                                fontSize: '14px',
-                                                cursor: 'help'
-                                            }} />
-                                        </Tooltip>
                                     </div>
                                     <motion.button
                                         className="btn-remove"
@@ -132,8 +109,8 @@ function HistoryCard({
                                 </motion.div>
                             ))}
                         </AnimatePresence>
-                        <motion.button 
-                            className="btn-add" 
+                        <motion.button
+                            className="btn-add"
                             onClick={addSemester}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
@@ -148,7 +125,7 @@ function HistoryCard({
             {/* Quick Mode */}
             <AnimatePresence mode="wait">
                 {mode === 'quick' && (
-                    <motion.div 
+                    <motion.div
                         className="quick-mode"
                         key="quick"
                         initial={{ opacity: 0, height: 0 }}
@@ -157,12 +134,7 @@ function HistoryCard({
                         transition={{ duration: 0.3 }}
                     >
                         <div className="input-group">
-                            <label>
-                                Current CGPA
-                                <Tooltip content="Your cumulative grade point average (0-10 scale)">
-                                    <FiHelpCircle style={{ marginLeft: '6px', fontSize: '14px', color: 'var(--text-muted)', cursor: 'help' }} />
-                                </Tooltip>
-                            </label>
+                            <label>Current CGPA</label>
                             <input
                                 type="number"
                                 placeholder="e.g. 8.4"
@@ -174,12 +146,7 @@ function HistoryCard({
                             />
                         </div>
                         <div className="input-group">
-                            <label>
-                                Total Past Credits
-                                <Tooltip content="Total credit hours you've completed so far">
-                                    <FiHelpCircle style={{ marginLeft: '6px', fontSize: '14px', color: 'var(--text-muted)', cursor: 'help' }} />
-                                </Tooltip>
-                            </label>
+                            <label>Total Past Credits</label>
                             <input
                                 type="number"
                                 placeholder="e.g. 82"
