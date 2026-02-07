@@ -71,10 +71,10 @@ function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, 
                     )}
                 </label>
                 <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*\.?[0-9]*"
                     placeholder={isNextSem ? 'e.g. 24' : 'e.g. 160'}
-                    step="any"
-                    min="0"
                     value={futureCredits}
                     onChange={(e) => setFutureCredits(e.target.value)}
                 />
@@ -87,11 +87,10 @@ function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, 
                     Target CGPA Goal
                 </label>
                 <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
+                    pattern="[0-9]*\.?[0-9]*"
                     placeholder="e.g. 9.0"
-                    step="0.01"
-                    min="0"
-                    max="10"
                     value={targetCGPA}
                     onChange={(e) => setTargetCGPA(e.target.value)}
                     style={{ borderColor: 'var(--accent-primary)' }}

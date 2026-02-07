@@ -78,21 +78,20 @@ function HistoryCard({
                                 >
                                     <div>
                                         <input
-                                            type="number"
+                                            type="text"
+                                            inputMode="decimal"
+                                            pattern="[0-9]*\.?[0-9]*"
                                             placeholder={`SGPA ${index + 1}`}
-                                            step="0.01"
-                                            min="0"
-                                            max="10"
                                             value={sem.sgpa}
                                             onChange={(e) => updateSemester(index, 'sgpa', e.target.value)}
                                         />
                                     </div>
                                     <div>
                                         <input
-                                            type="number"
+                                            type="text"
+                                            inputMode="decimal"
+                                            pattern="[0-9]*\.?[0-9]*"
                                             placeholder="Credits"
-                                            step="any"
-                                            min="0"
                                             value={sem.credits}
                                             onChange={(e) => updateSemester(index, 'credits', e.target.value)}
                                         />
@@ -128,19 +127,19 @@ function HistoryCard({
                     <motion.div
                         className="quick-mode"
                         key="quick"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
+                        style={{ minHeight: '200px' }}
                     >
                         <div className="input-group">
                             <label>Current CGPA</label>
                             <input
-                                type="number"
+                                type="text"
+                                inputMode="decimal"
+                                pattern="[0-9]*\.?[0-9]*"
                                 placeholder="e.g. 8.4"
-                                step="0.01"
-                                min="0"
-                                max="10"
                                 value={quickData.cgpa}
                                 onChange={(e) => setQuickData({ ...quickData, cgpa: e.target.value })}
                             />
@@ -148,10 +147,10 @@ function HistoryCard({
                         <div className="input-group">
                             <label>Total Past Credits</label>
                             <input
-                                type="number"
+                                type="text"
+                                inputMode="decimal"
+                                pattern="[0-9]*\.?[0-9]*"
                                 placeholder="e.g. 82"
-                                step="any"
-                                min="0"
                                 value={quickData.credits}
                                 onChange={(e) => setQuickData({ ...quickData, credits: e.target.value })}
                             />
