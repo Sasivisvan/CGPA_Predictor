@@ -7,6 +7,8 @@ import CGPAProgressRing from './CGPAProgressRing';
 import ScenarioChart from './ScenarioChart';
 
 function Results({ results }) {
+    const [isExpanded, setIsExpanded] = useState(false);
+
     if (!results) return null;
 
     const {
@@ -19,8 +21,6 @@ function Results({ results }) {
         difficulty,
         scenarios
     } = results;
-
-    const [isExpanded, setIsExpanded] = useState(false);
     const visibleScenarios = isExpanded ? scenarios : scenarios.slice(0, 10);
 
     // Get difficulty badge class

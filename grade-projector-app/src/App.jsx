@@ -26,9 +26,6 @@ function App() {
   const [isCalculating, setIsCalculating] = useState(false);
   const resultsRef = useRef(null);
 
-  // --- Helper: Fixes Floating Point Math (e.g. 24.30000004 -> 24.3) ---
-  const sanitize = (num) => Math.round(num * 10000) / 10000;
-
   // Load example data
   const loadExampleData = () => {
     toast.dismiss();
@@ -95,8 +92,7 @@ function App() {
           const sgpa = parseFloat(sem.sgpa);
           const credits = parseFloat(sem.credits);
           if (!isNaN(sgpa) && !isNaN(credits)) {
-            // Fix: Sanitize immediately to prevent error accumulation
-            pastPoints += sanitize(sgpa * credits);
+            pastPoints += sgpa * credits;
             pastCredits += credits;
           }
         });
@@ -104,7 +100,7 @@ function App() {
         const cgpa = parseFloat(quickData.cgpa);
         const credits = parseFloat(quickData.credits);
         if (!isNaN(cgpa) && !isNaN(credits)) {
-          pastPoints = sanitize(cgpa * credits);
+          pastPoints = cgpa * credits;
           pastCredits = credits;
         }
       }
@@ -141,9 +137,8 @@ function App() {
         }
       }
 
-      // Fix: Sanitize divisions for current stats
-      const currentCGPA = sanitize(pastPoints / pastCredits);
-      const maxPossibleCGPA = sanitize((pastPoints + (10 * creditsToEarn)) / totalCredits);
+      const currentCGPA = pastPoints / pastCredits;
+      const maxPossibleCGPA = (pastPoints + (10 * creditsToEarn)) / totalCredits;
 
       // 3. Calculate required SGPA and difficulty
       let requiredSGPA = null;
@@ -153,10 +148,6 @@ function App() {
       if (!isNaN(target)) {
         const requiredPoints = (target * totalCredits) - pastPoints;
         requiredSGPA = requiredPoints / creditsToEarn;
-        
-        // Fix: Sanitize required SGPA result
-        requiredSGPA = sanitize(requiredSGPA);
-        
         const gap = requiredSGPA - currentCGPA;
 
         if (requiredSGPA > 10) {
@@ -175,19 +166,11 @@ function App() {
 
       // 4. Generate scenarios
       const scenarios = [];
-      // Fix: Use integer-based loop (0 to 30 steps) to avoid floating point errors like 9.6000001
-      for (let i = 0; i <= 30; i++) {
-        const sgpa = 10 - (i * 0.2);
-        
-        // Safety break if we go below 0 (unlikely with this loop but good practice)
-        if (sgpa < 0) break;
-
-        const projectedTotalPoints = pastPoints + sanitize(sgpa * creditsToEarn);
-        const projectedCGPA = sanitize(projectedTotalPoints / totalCredits);
-        const change = sanitize(projectedCGPA - currentCGPA);
-
+      for (let sgpa = 10; sgpa >= 4; sgpa -= 0.2) {
+        const projectedCGPA = (pastPoints + (sgpa * creditsToEarn)) / totalCredits;
+        const change = projectedCGPA - currentCGPA;
         scenarios.push({
-          sgpa: parseFloat(sgpa.toFixed(1)), // Ensure clean display (e.g. "9.8")
+          sgpa,
           newCGPA: projectedCGPA,
           change
         });
