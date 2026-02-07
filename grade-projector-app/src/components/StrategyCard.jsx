@@ -73,7 +73,7 @@ function StrategyCard({ strategy, setStrategy, futureCredits, setFutureCredits, 
                 <input
                     type="number"
                     placeholder={isNextSem ? 'e.g. 24' : 'e.g. 160'}
-                    step="0.5"
+                    step="any"
                     min="0"
                     value={futureCredits}
                     onChange={(e) => setFutureCredits(e.target.value)}

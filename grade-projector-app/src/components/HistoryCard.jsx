@@ -91,7 +91,7 @@ function HistoryCard({
                                         <input
                                             type="number"
                                             placeholder="Credits"
-                                            step="0.5"
+                                            step="any"
                                             min="0"
                                             value={sem.credits}
                                             onChange={(e) => updateSemester(index, 'credits', e.target.value)}
@@ -150,7 +150,7 @@ function HistoryCard({
                             <input
                                 type="number"
                                 placeholder="e.g. 82"
-                                step="0.5"
+                                step="any"
                                 min="0"
                                 value={quickData.credits}
                                 onChange={(e) => setQuickData({ ...quickData, credits: e.target.value })}

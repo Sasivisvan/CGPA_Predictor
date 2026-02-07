@@ -166,7 +166,9 @@ function App() {
 
       // 4. Generate scenarios
       const scenarios = [];
-      for (let sgpa = 10; sgpa >= 4; sgpa -= 0.2) {
+      // Use integer loop to avoid floating point errors
+      for (let i = 100; i >= 40; i -= 2) {
+        const sgpa = i / 10;
         const projectedCGPA = (pastPoints + (sgpa * creditsToEarn)) / totalCredits;
         const change = projectedCGPA - currentCGPA;
         scenarios.push({
